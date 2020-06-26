@@ -353,7 +353,8 @@ function humanFileSize (bytes, si = false, dp = 1) {
  * @type {string}
  * @constant
  */
-const _version = '1.0.0';
+const _version = '0.0.1';
+document.title = `TagViewer ${_version}`;
 
 let config = {}; let cache = {}; const safeMode = [false, false];
 if (fs.existsSync(path.join(app.app.getPath('userData'), 'config.json'))) {
