@@ -1593,7 +1593,7 @@ const vm = new Vue({
       return Array.prototype.concat.call([['Title', 'String'], ['Size', 'Size'], ['Resolution', 'Resolution']], this.$store.state.tagviewerMeta.propList);
     },
     canSearchProps: function () {
-      return this.allAvailProps.length > 3;
+      return this.allAvailProps.length > 5;
     },
     shownProps: function () {
       return this.propSearchString !== null ? this.allAvailProps.filter(el => el[0].toLowerCase().includes(this.propSearchString.toLowerCase())) : this.allAvailProps;
