@@ -470,6 +470,46 @@ const generateFilter = filter => {
       } else {
         return n => !fallbackRef(n.props, filter[1].prop, !filter[1].inclNoval);
       }
+    case 'propSize':
+      if (filter[1].condition === '=') {
+        return n => (n.size === parseInt(filter[1].val, 10));
+      }
+      if (filter[1].condition === '>') {
+        return n => (n.size > parseInt(filter[1].val, 10));
+      }
+      if (filter[1].condition === '<') {
+        return n => (n.size < parseInt(filter[1].val, 10));
+      }
+      if (filter[1].condition === '!=' || filter[1].condition === '≠') {
+        return n => (n.size !== parseInt(filter[1].val, 10));
+      }
+      if (filter[1].condition === '<=' || filter[1].condition === '≤') {
+        return n => (n.size <= parseInt(filter[1].val, 10));
+      }
+      if (filter[1].condition === '>=' || filter[1].condition === '≥') {
+        return n => (n.size >= parseInt(filter[1].val, 10));
+      }
+      break;
+    case 'propResolution':
+      if (filter[1].condition === '=') {
+        return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] === parseInt(filter[1].val[0], 10) && n.resolution[1] === parseInt(filter[1].val[1], 10));
+      }
+      if (filter[1].condition === '>') {
+        return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] > parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10)); // use total pixels
+      }
+      if (filter[1].condition === '<') {
+        return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] < parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10));
+      }
+      if (filter[1].condition === '!=' || filter[1].condition === '≠') {
+        return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] !== parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10));
+      }
+      if (filter[1].condition === '<=' || filter[1].condition === '≤') {
+        return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] <= parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10));
+      }
+      if (filter[1].condition === '>=' || filter[1].condition === '≥') {
+        return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] >= parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10));
+      }
+      break;
     case 'propNumber': // args: condition as String representing comparison, prop as String for the prop, val as Number for the value (includes Size) (and this is also for numericals like Size, Dimension, and Duration since they're stored in one unit—bytes, millimeters, and seconds respectively)
       if (filter[1].condition === '=') {
         return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : NaN) === parseInt(filter[1].val, 10));
@@ -519,9 +559,6 @@ const generateFilter = filter => {
         }
       }
       break;
-    case 'propResolution':
-      console.warn('Resolution comparisons are currently not supported.');
-      return () => true; // TODO: implement (maybe support single params and total pixels, double comparison might be too complicated, and could always be implemented as two singles)
     case 'propList': // supports inclusions and exclusions only so far
       if (filter[1].positive) { // no such thing as Noval for a list
         return n => (fallbackRef(n.props, filter[1].prop, []).includes(filter[1].val));
@@ -1373,10 +1410,31 @@ const vm = new Vue({
     },
     'filter-option-prop': {
       props: ['filter'],
-      template: '<div><button @click="addSelf"><i class="material-icons">add_circle</i></button><button v-if="filter[1] === \'Boolean\'" @click="addSelfNegative"><i class="material-icons">remove_circle</i></button><span>{{ filter[0] }}</span><select v-if="filter[1] !== \'Boolean\'" v-model="comparisonType"><option v-for="option of comparisonContent" :value="option">{{option}}</option></select><input v-if="filter[1] !== \'Boolean\'" :type="inputType" v-model="value"><input v-model="inclNoval" type="checkbox" title="Include items that have no value for this property?"><input v-if="filter[1] === \'String\'" v-model="caseSensitive" type="checkbox" title="Should the capitalization have to match exactly?"></div>',
+      template:
+`<div>
+  <button @click="addSelf"><i class="material-icons">add_circle</i></button>
+  <button v-if="filter[1] === 'Boolean'" @click="addSelfNegative"><i class="material-icons">remove_circle</i></button>
+  <span>{{ filter[0] }}</span>
+  <select v-if="filter[1] !== 'Boolean'" v-model="comparisonType">
+    <option v-for="option of comparisonContent" :value="option">{{option}}</option>
+  </select>
+  <input v-if="filter[1] !== 'Boolean'" :type="inputType" v-model="value">
+  <span v-if="filter[1] === 'Resolution'">&times;</span>
+  <input v-if="filter[1] === 'Resolution' v-model="value2" type="number">
+  <select v-if="filter[1] === 'Size'" v-model="value2">
+    <option value="0">B</option>
+    <option value="3">kB</option>
+    <option value="6">MB</option>
+    <option value="9">GB</option>
+    <option value="12">TB</option>
+  </select>
+  <input v-if="filter[1] !== 'Size' && filter[0] !== 'Title'" v-model="inclNoval" type="checkbox" title="Include items that have no value for this property?">
+  <input v-if="filter[1] === 'String'" v-model="caseSensitive" type="checkbox" title="Should the capitalization have to match exactly?">
+</div>`,
       data: function () {
         return {
           value: this.filter[1] === 'Boolean' ? false : '',
+          value2: null,
           comparisonType: null,
           inclNoval: false,
           caseSensitive: false
@@ -1384,10 +1442,10 @@ const vm = new Vue({
       },
       computed: {
         inputType: function () {
-          return { String: 'text', Number: 'number', Boolean: 'hidden' }[this.filter[1]];
+          return { String: 'text', Number: 'number', Boolean: 'hidden', Size: 'number', Resolution: 'number' }[this.filter[1]];
         },
         comparisonContent: function () {
-          return { String: ['=', '≠', '{}', '!{'], Number: ['>', '<', '=', '≠', '≥', '≤'], Boolean: [] }[this.filter[1]];
+          return { String: ['=', '≠', '{}', '!{'], Number: ['>', '<', '=', '≠', '≥', '≤'], Size: ['>', '<', '=', '≠', '≥', '≤'], Resolution: ['>', '<', '=', '≠', '≥', '≤'], Boolean: [] }[this.filter[1]];
         }
       },
       methods: {
@@ -1396,6 +1454,10 @@ const vm = new Vue({
             this.$el.children[3].focus();
           } else if (this.filter[1] !== 'Boolean' && this.comparisonType === null) {
             this.$el.children[2].focus();
+          } else if (this.filter[1] === 'Size') {
+            this.$emit('add-self', ['propSize', { condition: this.comparisonType, val: this.value * (10 ** parseInt(this.value2, 10)) }]);
+          } else if (this.filter[1] === 'Resolution') {
+            this.$emit('add-self', ['propResolution', { condition: this.comparisonType, val: [this.value, this.value2], inclNoval: this.inclNoval }]);
           } else {
             this.$emit('add-self', ['prop' + this.filter[1], this.filter[1] === 'Boolean' ? { positive: true, prop: this.filter[0], inclNoval: this.inclNoval } : { prop: this.filter[0], condition: this.comparisonType, val: this.value, inclNoval: this.inclNoval, caseSensitive: this.caseSensitive }]);
           }
@@ -1528,7 +1590,7 @@ const vm = new Vue({
         Array.prototype.concat.call(this.$store.state.tagviewerMeta.propList, [['Title', 'String']]),
         el => !checkArray.includes(el[0])
       ); */
-      return Array.prototype.concat.call([['Title', 'String']], this.$store.state.tagviewerMeta.propList);
+      return Array.prototype.concat.call([['Title', 'String'], ['Size', 'Size'], ['Resolution', 'Resolution']], this.$store.state.tagviewerMeta.propList);
     },
     canSearchProps: function () {
       return this.allAvailProps.length > 3;
