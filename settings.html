@@ -21,6 +21,7 @@
         <ul v-show="currentPage === 'Slideshow'">
           <li><span>Duration to show each item (in seconds):</span><input type="number" min="0.1" step="0.001" v-model="slideshowInterval"></li>
           <li><span>End the slideshow when you exit fullscreen?</span><input type="checkbox" v-model="endSlideshowOnFSExit"></li>
+          <li><span>End the slideshow when the last item is reached?</span><input type="checkbox" v-model="stopSlideshowAtEnd"></li>
         </ul>
       </main>
     </div>

@@ -54,6 +54,14 @@ const vm = new Vue({
       set: function (newVal) {
         this.configObject.endSlideshowOnFSExit = newVal;
       }
+    },
+    stopSlideshowAtEnd: {
+      get: function () {
+        return fallbackRef(this.configObject, 'stopSlideshowAtEnd', false);
+      },
+      set: function (newVal) {
+        this.configObject.stopSlideshowAtEnd = newVal;
+      }
     }
   },
   components: {

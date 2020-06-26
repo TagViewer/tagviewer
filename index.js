@@ -1829,7 +1829,7 @@ const vm = new Vue({
     },
     startSlideshow: function () {
       this.slideshowInterval = this.slideshowInterval === null ? window.setInterval(function () {
-        if (vm.canGoForward) vm.goToNextMedia(); else vm.goToFirstMedia();
+        if (vm.canGoForward) vm.goToNextMedia(); else if (!fallbackRef(config, 'stopSlideshowAtEnd', false)) vm.goToFirstMedia(); else vm.endSlideshow();
       }, fallbackRef(config, 'slideshowInterval', 1000)) : this.slideshowInterval;
     },
     startSlideshowFS: function () {
