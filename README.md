@@ -29,4 +29,5 @@ Contributions are welcome in the form of issues and pull requests. Some relevant
 - In addition, Less is linted with StyleLint, using the included `.stylelintrc.json`. It deviates from `stylelint-config-standard` only in a few ways, which you can see for yourself in its configuration, the main change being that there is no space after colons in declarations.
 - As a general rule, the HTML, CSS, and JavaScript for a page all have the same name (`index.html`, `index.css` compiled from `index.less`, and `index.js`, for example). Therefore, the startup script is named `main.js`.
 - I use two spaces to indent, and if you don't like that, I don't know what to tell you.
+
 Pull requests should only make the minimum change required to fix the issue they address (whether that is a bug, enhancement, or something else).
