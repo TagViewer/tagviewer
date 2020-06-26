@@ -157,6 +157,9 @@ body > div #nav ul li {
   cursor: pointer;
   margin-bottom: 5px;
 }
+body > div #nav ul li[aria-current=true] {
+  text-decoration: underline;
+}
 body > div #content {
   grid-area: content;
   text-align: center;

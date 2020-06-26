@@ -1171,7 +1171,7 @@ const vm = new Vue({
   components: {
     'media-entry': {
       props: { name: String, ckey: Number },
-      template: '<li @click="openFile">{{ name }}</li>',
+      template: '<li :aria-current="this.$store.state.mediaNumber - 1 === ckey" @click="openFile">{{ name }}</li>',
       methods: {
         openFile: function () {
           this.$emit('open-file', this.ckey);

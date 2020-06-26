@@ -148,6 +148,9 @@ body {
         li {
           cursor:pointer;
           margin-bottom:5px;
+          &[aria-current=true] {
+            text-decoration: underline;
+          }
         }
       }
     }
