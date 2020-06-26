@@ -13,7 +13,7 @@ TagViewer is a simple program that allows viewing of media within a TagSpace, an
  - Extra metadata isn't important or necessary for your use case
  - You don't like Node/Electron apps
 ## License
-![License badge](https://img.shields.io/badge/license-GPL%203.0-blue)    
+![License badge](https://img.shields.io/badge/license-GPL%20v3.0-blue)    
 TagViewer Copyright © 2020  Matt Fellenz
 This program comes with ABSOLUTELY NO WARRANTY; read the license for more details. This is free software, and you are welcome to redistribute it under certain conditions, as outlined in the license.
 
