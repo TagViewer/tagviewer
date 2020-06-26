@@ -21,7 +21,7 @@ TagViewer is designed to be intuitive by default but also allow meaningful confi
 ## Hacking
 Contributions are welcome in the form of issues and pull requests. Some relevant information:
 - TagViewer is written in Vue with a Vuex store, on top of Electron.
-- To start the program in a development environment, simply run `npm start`.
+- To start the program in a development environment, simply run `npm run startdev` for a development environment or `npm start` for production.
 - The metadata is stored in JSON, as is the cache and configuration (though these are stored in TagViewer's install directory).
 - JavaScript is linted with ESLint Semistandard, using the rules in the `.eslintrc` file. This means that I use semicolons, because things get hairy if you don't. The only change I've made to the `.eslintrc` is to not use parens surrounding single arguments for arrow functions.
 - HTML is linted with LintHTML, simply to check for proper syntax (as opposed to id/class/attribute consistency).
