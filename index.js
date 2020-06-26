@@ -1346,15 +1346,15 @@ const vm = new Vue({
         content: function () {
           switch (this.type) {
             case 'tag':
-              return 'Tag: ' + store.state.tagviewerMeta.tagList[this.filter[1].tag][0];
+              return `Tag: ${store.state.tagviewerMeta.tagList[this.filter[1].tag][0]}`;
             case 'tagColor':
-              return 'Color: ' + this.filter[1].color;
+              return `Color: ${this.filter[1].color}`;
             case 'propBoolean':
-              return 'Prop: ' + this.filter[1].prop + ' is ' + this.filter[1].positive.toString();
+              return `Prop: ${this.filter[1].prop} is ${this.filter[1].positive.toString()}`;
             case 'propString':
-              return 'Prop: ' + this.filter[1].prop + ' ' + this.filter[1].condition + ' "' + this.filter[1].val + '"';
+              return `Prop: ${this.filter[1].prop} ${this.filter[1].condition} "${this.filter[1].val}"`;
             case 'propNumber':
-              return 'Prop: ' + this.filter[1].prop + ' ' + this.filter[1].condition + ' ' + this.filter[1].val;
+              return `Prop: ${this.filter[1].prop} ${this.filter[1].condition} ${this.filter[1].val}`;
           }
         },
         icon: function () {
