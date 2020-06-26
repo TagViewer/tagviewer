@@ -1355,6 +1355,10 @@ const vm = new Vue({
               return `Prop: ${this.filter[1].prop} ${this.filter[1].condition} "${this.filter[1].val}"`;
             case 'propNumber':
               return `Prop: ${this.filter[1].prop} ${this.filter[1].condition} ${this.filter[1].val}`;
+            case 'propResolution':
+              return `Prop: Resolution ${this.filter[1].condition} ${this.filter[1].val.join('\u00d7')}`;
+            case 'propSize':
+              return `Prop: Size ${this.filter[1].condition} ${humanFileSize(this.filter[1].val, true, 1)}`;
           }
         },
         icon: function () {
@@ -1365,6 +1369,8 @@ const vm = new Vue({
               return this.filter[1].positive ? 'add_circle' : 'remove_circle';
             case 'propString':
             case 'propNumber':
+            case 'propSize':
+            case 'propResolution':
               return 'album'; // idk, this one looks kind of interesting and I think the symbol in the middle (if you can stop looking at it as a record) can represent "indeterminate" fairly well.
           }
         },
