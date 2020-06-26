@@ -1,0 +1,38 @@
+{
+  "name": "tagviewer",
+  "version": "0.0.1",
+  "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags. Sorting is also implemented.",
+  "main": "main.js",
+  "dependencies": {
+    "fs-extra": "^9.0.0",
+    "image-size": "^0.8.3",
+    "trash": "^6.1.1"
+  },
+  "devDependencies": {
+    "electron": "^9.0.4",
+    "@linthtml/linthtml": "^0.4.1",
+    "eslint": "^7.3.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "stylelint": "^13.6.0",
+    "stylelint-config-standard": "^20.0.0"
+  },
+  "scripts": {
+    "start": "electron .",
+    "startdev": "NODE_ENV=development electron ."
+  },
+  "keywords": [
+    "tag",
+    "viewer",
+    "media",
+    "files",
+    "sorting",
+    "tags",
+    "categorization",
+    "organization"
+  ],
+  "author": "Matt Fellenz",
+  "license": "GPL-3.0-only"
+}

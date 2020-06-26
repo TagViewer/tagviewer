@@ -1,0 +1,9 @@
+{
+  "indent-width": false,
+  "attr-name-style": false,
+  "attr-bans": [],
+  "class-style": "dash",
+  "id-class-style": false,
+  "tag-bans": ["center", "marquee", "acronym", "applet", "basefont", "big", "dir", "font", "frame", "frameset", "isindex", "noframes", "s", "strike", "tt"],
+  "attr-quote-style": "double"
+}

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>TagViewer 1.0.0</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="index.css" rel="stylesheet">
+    <link rel="license" href="https://opensource.org/licenses/GPL-3.0">
+    <script src="lib/vue.min.js"></script>
+    <script src="lib/vuex.min.js"></script>
+    <script src="lib/interact.min.js"></script>
+  </head>
+  <body class="before-content-load"><div id="vue-container">
+    <header id="top-bar">
+      <button type="button" id="open-tagspace" title="Open TagSpace" aria-label="Open Tag Space" v-on:click="openTagspaceDialog"><i class="material-icons">folder</i></button>
+      <button type="button" id="new-tagspace" title="New TagSpace" aria-label="New Tag Space" v-on:click="newTagspaceDialog"><i class="material-icons">create_new_folder</i></button>
+      <button type="button" :disabled="!tagspaceIsOpen" id="add-media" title="Add Media" aria-label="Add Media" v-on:click="addMediaDialog"><i class="material-icons">add_photo_alternate</i></button>
+      <div class="divider"></div>
+      <button type="button" :disabled="!canGoToFirst" id="first-media" title="First Media" aria-label="Back to First Media" v-on:click="goToFirstMedia"><i class="material-icons">first_page</i></button>
+      <button type="button" :disabled="!canGoBack" id="prev-media" title="Previous Media" aria-label="Previous Media" v-on:click="goToPreviousMedia"><i class="material-icons">navigate_before</i></button>
+      <input type="number" :disabled="!haveMediaOptions" id="media-number" title="Media Number" aria-label="Current Media Number" min="1" :max="this.currentFiles.length" v-model.lazy.number="mediaNumber">
+      <button type="button" :disabled="!canGoForward" id="next-media" title="Next Media" aria-label="Next Media" v-on:click="goToNextMedia"><i class="material-icons">navigate_next</i></button>
+      <button type="button" :disabled="!canGoToLast" id="last-media" title="Last Media" aria-label="Go to Last Media" v-on:click="goToLastMedia"><i class="material-icons">last_page</i></button>
+      <div class="divider"></div>
+      <button type="button" :disabled="!mediaIsOpen" id="open-media-in-files" title="Open Media in Files" aria-label="Open the Current Media in Files" v-on:click="viewMediaExternal"><i class="material-icons">publish</i></button>
+      <button type="button" :disabled="!mediaIsOpen" id="remove-current-media" title="Delete Current Media" aria-label="Delete the Current Media" v-on:click="deleteMedia"><i class="material-icons">remove_circle</i></button>
+      <button type="button" :disabled="!mediaIsOpen" id="replace-media" title="Replace Media" aria-label="Replace Media" v-on:click="replaceMedia"><i class="material-icons">flip_camera_ios</i></button>
+      <div class="divider"></div>
+      <button type="button" :disabled="!filtersActive" id="remove-filter" title="Remove Filter" aria-label="Remove the Current Filter" v-on:click="removeAllFilters"><i class="material-icons">filter_none</i></button>
+      <div class="divider"></div>
+      <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start" title="Slideshow" aria-label="Start a Slideshow" v-on:click="startSlideshow"><i class="material-icons" style="transform:scale(0.8)">slideshow</i></button>
+      <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start-fs" title="Slideshow (Fullscreen)" aria-label="Start a Slideshow in Fullscreen mode" v-on:click="startSlideshowFS"><i class="material-icons" style="transform:scale(1.05)">slideshow</i></button>
+      <button type="button" :disabled="!haveMediaOptions || slideshowInterval === null" id="slideshow-end" title="End Slideshow" aria-label="End the Slideshow" v-on:click="endSlideshow"><i class="material-icons">stop</i></button>
+      <div class="divider"></div>
+      <button type="button" :disabled="!tagspaceIsOpen" id="edit-tagspace" title="Configure TagSpace" aria-label="Configure the current TagSpace." v-on:click="configureTagSpaceDialog"><i class="material-icons">edit</i></button>
+      <button type="button" id="settings" title="Settings" aria-label="Tag Viewer Settings" v-on:click="settingsDialog"><i class="material-icons">settings</i></button>
+      <button type="button" id="about" title="About TagViewer" aria-label="About Tag Viewer" v-on:click="aboutDialog"><i class="material-icons">info</i></button>
+      <button type="button" id="help" title="TagViewer Help" aria-label="Get Help operating this application" v-on:click="helpDialog"><i class="material-icons">help</i></button>
+      <div class="divider"></div>
+      <button type="button" id="toggle-fullscreen" title="Toggle Fullscreen" aria-label="Toggle whether the application is fullscreen" v-on:click="isFullscreen = !isFullscreen;"><i class="material-icons">fullscreen{{ isFullscreen ? '_exit' : '' }}</i></button>
+      <button type="button" id="invert-colors" title="Invert Colors" aria-label="Invert the color scheme." v-on:click="invertColors"><i class="material-icons">invert_colors</i></button>
+    </header>
+    <nav id="nav">
+      <p style="margin-top:10px;text-align:center;width:100%;grid-area: napp;" v-show="!tagspaceIsOpen">No TagSpace Open.</p>
+      <ul style="grid-area: files;">
+        <media-entry v-for="(item,index) in currentFilesJSON" :name="item.title" :key="index" :ckey="index" @open-file="openSelf"></media-entry>
+      </ul>
+      <div style="grid-area: sort;" v-if="mediaPath !== ''">
+        <span>Sort by:&#x00a0;</span>
+        <select v-model="sortBy">
+          <option v-for="option in sortByOptions" :value="option">{{ option }}</option>
+        </select>
+        <select v-model="sortMethod" v-if="sortMethodOptions.length > 0">
+          <option v-for="method in sortMethodOptions" :value="method.value">{{ method.name }}</option>
+        </select>
+        <select v-model="sortBy2" v-if="sortBy2Options.length > 0">
+          <option v-for="option in sortBy2Options" :value="option">{{ option }}</option>
+        </select>
+        <select v-model="sortMethod2" v-if="sortMethod2Options.length > 0">
+          <option v-for="method in sortMethod2Options" :value="method.value">{{ method.name }}</option>
+        </select>
+      </div>
+    </nav>
+    <main id="content">
+      <h1 v-show="!tagspaceIsOpen">Welcome to TagViewer!</h1>
+      <div id="landing-options" v-show="!tagspaceIsOpen">
+        <button type="button" id="landing__new-tagspace" v-on:click="newTagspaceDialog">New TagSpace...</button>
+        <button type="button" id="landing__open-tagspace" v-on:click="openTagspaceDialog">Open Existing TagSpace...</button>
+        <button type="button" id="landing__open-prev-tagspace" :disabled="!offeringPreviousLocation" v-on:click="openPreviousTagspace">Open Previous TagSpace</button>
+        <hr>
+        <button type="button" id="landing__settings" v-on:click="settingsDialog">Settings...</button>
+        <button type="button" id="landing__about" v-on:click="aboutDialog">About</button>
+        <button type="button" id="landing__help" v-on:click="helpDialog">Help</button>
+      </div>
+      <h1 style="opacity:0;" v-show="!tagspaceIsOpen">Welcome to TagViewer!</h1> <!-- equal weight of content; graphic design principle -->
+      <component :is="mediaViewerType" id="currentMedia" v-show="mediaIsOpen" :source="mediaPath" :style="isFullscreen ? { 'max-width': '100%', 'max-height': '100%' } : {}"></component>
+    </main>
+    <aside id="filters-props">
+      <nav id="aside-nav">
+        <button type="button" style="text-overflow:ellipsis;--underline-width:4.05rem;" @click="asideTab = 0;" :aria-current="asideTab === 0">Properties</button>
+        <button type="button" style="--underline-width:2.47rem;" @click="asideTab = 1;" :aria-current="asideTab === 1">Filters</button>
+      </nav>
+      <div v-show="!asideTab"> <!-- 0 is falsy --> <!-- Properties -->
+        <h3 v-if="!mediaIsOpen" style="text-align:center;">No media open.</h3>
+        <ul v-if="mediaIsOpen">
+          <prop-entry v-for="(prop, index) in itemProperties" :prop="prop" :key="index" @change-self="changeProperty"></prop-entry>
+        </ul>
+        <h3 v-if="mediaIsOpen"><span>Tags</span></h3>
+        <div v-if="mediaIsOpen">
+          <tag-entry v-for="(tag, index) in itemTags" :tag="tag" :key="index" :index="index" @remove-self="removeTag"></tag-entry>
+        </div>
+        <div v-if="mediaIsOpen">
+          <tag-option v-for="(tag, index) in offeredItemTags" :tag="tag" :key="index" @add-self="addTag"></tag-option>
+        </div>
+      </div>
+      <div v-show="asideTab"> <!-- 1 is truthy --> <!-- Filters -->
+        <div id="current-filters" v-if="mediaIsOpen">
+          <filter-chip v-for="(filter, index) of currentFilters" :filter="filter" :type="filter[0]" :key="index" :index="index" @remove-self="removeFilter"></filter-chip>
+        </div>
+        <div v-if="mediaIsOpen">
+          <h3><i class="material-icons">local_offer</i> Tags <input type="text" v-if="tagSearchString !== null" v-model="tagSearchString" size="1" v-on:blur="function () { if (tagSearchString === '') tagSearchString = null; }"><button type="button" v-if="canSearchTags && tagSearchString === null" @click="tagSearchString = '';"><i class="material-icons">search</i></button></h3>
+          <div id="tag-offers">
+            <filter-option v-for="(filter, index) of shownTags" :filter="filter" type="tag" :key="index" @add-self="addFilter"></filter-option>
+          </div>
+        </div>
+        <div v-if="mediaIsOpen">
+          <h3><i class="material-icons">invert_colors</i> Colors <input type="text" v-if="colorSearchString !== null" v-model="colorSearchString" size="1" v-on:blur="function () { if (colorSearchString === '') colorSearchString = null; }"><button type="button" v-if="canSearchColors && colorSearchString === null" @click="colorSearchString = '';"><i class="material-icons">search</i></button></h3>
+          <div id="color-offers">
+            <filter-option v-for="(filter, index) of shownColors" :filter="filter" type="color" :key="index" @add-self="addFilter"></filter-option>
+          </div>
+        </div>
+        <div v-if="mediaIsOpen">
+          <h3><i class="material-icons">article</i> Properties <input type="text" v-if="propSearchString !== null" v-model="propSearchString" size="1" v-on:blur="function () { if (propSearchString === '') propSearchString = null; }"><button type="button" v-if="canSearchProps && propSearchString === null" @click="propSearchString = '';"><i class="material-icons">search</i></button></h3>
+          <div id="prop-offers">
+            <filter-option-prop v-for="(filter, index) of shownProps" :filter="filter" :key="index" @add-self="addPremadeFilter"></filter-option-prop>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <footer id="status">
+      <span>&#x00a0;</span> <!--formatting-->
+      <span v-if="mediaIsOpen && currentFileJSON !== null">{{ currentFileJSON.tags.length }} out of {{ $store.state.tagviewerMeta.tagList.length }} tags applied to this item.&#x00a0;&#x00a0;|&#x00a0;&#x00a0;{{ currentFilesJSON.length }} item{{ currentFilesJSON.length!==1 ? 's' : ''}} match{{ currentFilesJSON.length===1 ? 'es' : '' }} the filter out of {{ $store.state.tagviewerMeta.files.length }} in the TagSpace.&#x00a0;&#x00a0;|&#x00a0;&#x00a0;</span>
+      <span v-if="tagspaceIsOpen">{{ showExitPrompt ? 'Saving changes to disk...' : 'All changes are saved to disk.' }}</span>
+    </footer>
+    <div id="filter-quake" :aria-current="filterQuake"><input type="text" v-model="tentativeFilterText"></div></div>
+    <script src="index.js" type="text/javascript"></script>
+  </body>
+</html>

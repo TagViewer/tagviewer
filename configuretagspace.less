@@ -1,0 +1,147 @@
+html, body {height:calc(100% - 10px);font-family:sans-serif;}
+form {
+  fieldset {
+    margin-bottom:6px;
+    label {
+      line-height:1.4; // aligns labels with inputs.
+    }
+    padding-right:2px;
+  }
+  #basic-information .fields {
+    display:grid;
+    grid-template-rows: auto auto;
+    grid-template-columns:auto 1fr;
+    row-gap:3px;
+    label {
+      padding-right:2ch;
+    }
+  }
+  #add-tags ul {
+    list-style:none;
+    padding-left:0;
+    margin:0;
+    li {
+      display:flex;
+      flex-direction:row;
+      justify-content:stretch;
+      margin:3px 0;
+      input {
+        &:first-of-type {
+          padding-right:9px;
+          flex-grow:10;
+        }
+        &:nth-of-type(2) {
+          flex-grow:1;
+          max-width:90px;
+        }
+      }
+      input, label {
+        padding:0 6px;
+      }
+      label {
+        line-height:1.5;
+      }
+      button {
+        background:none;
+        line-height:1;
+        border:none;
+        color:#111;
+        width:25px;
+        height:25px;
+        padding:0;
+        margin:0 4px;
+        border-radius:3px;
+        cursor:pointer;
+        box-shadow:none;
+        transition:box-shadow ease .2s, outline-color ease .25s;
+        outline:1px auto white;
+        outline-offset:-1px;
+        &:hover {
+          box-shadow:0 0 3px 2px #0004;
+        }
+        &:active {
+          box-shadow:0 0 4px 1px #0002;
+        }
+        &:focus {
+          outline:1px auto rgba(240, 175, 47,1);
+          outline-offset:-1px;
+        }
+        &:disabled {
+          color:darkgrey;
+          cursor:default;
+          &:hover {
+            box-shadow:none;
+          }
+        }
+        .material-icons {
+          padding:4px;
+          font-size:17px;
+        }
+      }
+    }
+  }
+  #add-props ul {
+    list-style:none;
+    padding-left:0;
+    margin:0;
+    li {
+      display:flex;
+      flex-direction:row;
+      justify-content:stretch;
+      margin:3px 0;
+      input {
+        &:first-of-type {
+          padding-right:9px;
+          flex-grow:10;
+        }
+        &:nth-of-type(2) {
+          flex-grow:1;
+          max-width:90px;
+        }
+      }
+      input, label {
+        padding:0 6px;
+      }
+      label {
+        line-height:1.5;
+      }
+      button {
+        background:none;
+        line-height:1;
+        border:none;
+        color:#111;
+        width:25px;
+        height:25px;
+        padding:0;
+        margin:0 4px;
+        border-radius:3px;
+        cursor:pointer;
+        box-shadow:none;
+        transition:box-shadow ease .2s, outline-color ease .25s;
+        outline:1px auto white;
+        outline-offset:-1px;
+        &:hover {
+          box-shadow:0 0 3px 2px #0004;
+        }
+        &:active {
+          box-shadow:0 0 4px 1px #0002;
+        }
+        &:focus {
+          outline:1px auto rgb(240, 175, 47);
+          outline-offset:-1px;
+        }
+        &:disabled {
+          color:darkgrey;
+          cursor:default;
+          &:hover {
+            box-shadow:none;
+          }
+        }
+        .material-icons {
+          padding:4px;
+          font-size:17px;
+        }
+      }
+    }
+  }
+}

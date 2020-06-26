@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+    <link rel="stylesheet" href="settings.css" type="text/css">
+    <script src="lib/vue.min.js"></script>
+  </head>
+  <body>
+    <div id="vue-container">
+      <nav-sidebar v-bind:current-page.sync="currentPage"></nav-sidebar>
+      <main>
+        <h1>{{ currentPage }}</h1>
+        <ul v-show="currentPage === 'Interface'">
+          <li><span>Save the width of the sidebars between restarts?</span><input type="checkbox" v-model="saveWidths"></li>
+        </ul>
+        <ul v-show="currentPage === 'General'">
+          <li><span>Offer the previously open TagSpace on the landing page?</span><input type="checkbox" v-model="offerPrevLocation"></li>
+          <li><span>Automatically reopen the previously open TagSpace when TagViewer starts?</span><input type="checkbox" v-model="resumeSessionOnRestart"></li>
+        </ul>
+        <ul v-show="currentPage === 'Slideshow'">
+          <li><span>Duration to show each item (in seconds):</span><input type="number" min="0.1" step="0.001" v-model="slideshowInterval"></li>
+          <li><span>End the slideshow when you exit fullscreen?</span><input type="checkbox" v-model="endSlideshowOnFSExit"></li>
+        </ul>
+      </main>
+    </div>
+    <script src="settings.js" type="text/javascript"></script>
+  </body>
+</html>

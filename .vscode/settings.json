@@ -1,0 +1,50 @@
+{
+  "git.enabled": false,
+  "VSCodeCounter.showInStatusBar": true,
+  "VSCodeCounter.blockComment": [
+    {
+      "types": [
+        "cpp"
+      ],
+      "patterns": [
+        [
+          "R\"(",
+          ")\""
+        ]
+      ]
+    },
+    {
+      "types": [
+        "lua"
+      ],
+      "patterns": [
+        [
+          "[[",
+          "]]"
+        ]
+      ]
+    },
+    {
+      "types": [
+        ".js",
+        ".jsx",
+        ".ts",
+        ".tsx"
+      ],
+      "patterns": [
+        [
+          "`",
+          "`"
+        ],
+        [
+          "/*",
+          "*/"
+        ],
+        [
+          "/**",
+          "*/"
+        ]
+      ]
+    }
+  ]
+}
