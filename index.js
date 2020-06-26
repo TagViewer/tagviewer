@@ -276,13 +276,13 @@ function debounce (func, wait, immediate) { // credit david walsh
 function hexToHSL (H) { // credit CSS Tricks
   let r = 0; let g = 0; let b = 0;
   if (H.length === 4) {
-    r = '0x' + H[1] + H[1];
-    g = '0x' + H[2] + H[2];
-    b = '0x' + H[3] + H[3];
+    r = `0x${H[1]}${H[1]}`;
+    g = `0x${H[2]}${H[2]}`;
+    b = `0x${H[3]}${H[3]}`;
   } else if (H.length === 7) {
-    r = '0x' + H[1] + H[2];
-    g = '0x' + H[3] + H[4];
-    b = '0x' + H[5] + H[6];
+    r = `0x${H[1]}${H[2]}`;
+    g = `0x${H[3]}${H[4]}`;
+    b = `0x${H[5]}${H[6]}`;
   }
   r /= 255;
   g /= 255;
@@ -331,7 +331,7 @@ function humanFileSize (bytes, si = false, dp = 1) {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {
-    return bytes + ' B';
+    return `${bytes} B`;
   }
 
   const units = si
@@ -345,7 +345,7 @@ function humanFileSize (bytes, si = false, dp = 1) {
     ++u;
   } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
 
-  return bytes.toFixed(dp) + ' ' + units[u];
+  return `${bytes.toFixed(dp)} ${units[u]}`;
 }
 
 /**
@@ -361,7 +361,7 @@ if (fs.existsSync(path.join(app.app.getPath('userData'), 'config.json'))) {
   try {
     config = fs.readJsonSync(path.join(app.app.getPath('userData'), 'config.json'));
   } catch (e) {
-    dialog.showErrorBox('Error parsing config.json', "We've encountered an error while parsing the configuration file. If you've edited the file, please find the error and fix it. If not, this is an issue with TagViewer, that you should report on GitHub. Due to this error, changes to the configuration will not be saved until you either rectify the error or delete the configuration completely. The error is as follows: " + e.toString());
+    dialog.showErrorBox('Error parsing config.json', `We've encountered an error while parsing the configuration file. If you've edited the file, please find the error and fix it. If not, this is an issue with TagViewer, that you should report on GitHub. Due to this error, changes to the configuration will not be saved until you either rectify the error or delete the configuration completely. The error is as follows: ${e.toString()}`);
     safeMode[0] = true;
   }
 } else {
@@ -371,7 +371,7 @@ if (fs.existsSync(path.join(app.app.getPath('userData'), 'cache.json'))) {
   try {
     cache = fs.readJsonSync(path.join(app.app.getPath('userData'), 'cache.json'));
   } catch (e) {
-    dialog.showErrorBox('Error parsing cache.json', "We've encountered an error while parsing the cache file. If you've edited the file, please find the error and fix it. If not, this is an issue with TagViewer, that you should report on GitHub. Due to this error, changes to the cache will not be saved until you either rectify the error or delete the cache completely. The error is as follows: " + e.toString());
+    dialog.showErrorBox('Error parsing cache.json', `We've encountered an error while parsing the cache file. If you've edited the file, please find the error and fix it. If not, this is an issue with TagViewer, that you should report on GitHub. Due to this error, changes to the cache will not be saved until you either rectify the error or delete the cache completely. The error is as follows: ${e.toString()}`);
     safeMode[1] = true;
   }
 } else {
@@ -576,7 +576,7 @@ const generateFilter = filter => {
 const stringifyFilter = filters => {
   const ret = [];
   for (const filter of filters) {
-    ret.push((filter[1].positive ? '+' : '-') + { tag: 'tag', tagColor: 'color' }[filter[0]] + ':' + filter[1][{ tag: 'tag', tagColor: 'color' }[filter[0]]]); // TODO add properties
+    ret.push(`${(filter[1].positive ? '+' : '-') + { tag: 'tag', tagColor: 'color' }[filter[0]]}:${filter[1][{ tag: 'tag', tagColor: 'color' }[filter[0]]]}`); // TODO add properties
   }
   return ret.join(' ');
 };
@@ -831,9 +831,9 @@ const debouncedConfigSync = debounce(() => { if (!safeMode[1]) fs.writeJSON(path
 
 if (Object.prototype.hasOwnProperty.call(config, 'navWidth')) {
   ((a, w) => {
-    a.style.width = (w > 24 ? w : 0) + 'px'; // the 24 and 12 must reflect the current padding!
-    a.style.paddingLeft = a.style.paddingRight = (w > 24 ? 12 : Math.max(w / 2, 2)) + 'px';
-    a.style.color = w > 24 ? '' : 'rgba(0,0,0,' + Math.max((w - 10) * 0.05, 0) + ')';
+    a.style.width = `${w > 24 ? w : 0}px`; // the 24 and 12 must reflect the current padding!
+    a.style.paddingLeft = a.style.paddingRight = `${w > 24 ? 12 : Math.max(w / 2, 2)}px`;
+    a.style.color = w > 24 ? '' : `rgba(0,0,0,${Math.max((w - 10) * 0.05, 0)})`;
   })(document.getElementById('nav'), config.navWidth);
 }
 interact('#nav').resizable({
@@ -844,9 +844,9 @@ interact('#nav').resizable({
         config.navWidth = Math.round(event.rect.width);
         debouncedConfigSync();
       }
-      event.target.style.width = (event.rect.width > 24 ? event.rect.width : 0) + 'px'; // the 24 and 12 must reflect the current padding!
-      event.target.style.paddingLeft = event.target.style.paddingRight = (event.rect.width > 24 ? 12 : Math.max(event.rect.width / 2, 2)) + 'px';
-      event.target.style.color = event.rect.width > 24 ? '' : 'rgba(0,0,0,' + Math.max((event.rect.width - 10) * 0.05, 0) + ')';
+      event.target.style.width = `${event.rect.width > 24 ? event.rect.width : 0}px`; // the 24 and 12 must reflect the current padding!
+      event.target.style.paddingLeft = event.target.style.paddingRight = `${event.rect.width > 24 ? 12 : Math.max(event.rect.width / 2, 2)}px`;
+      event.target.style.color = event.rect.width > 24 ? '' : `rgba(0,0,0,${Math.max((event.rect.width - 10) * 0.05, 0)})`;
     }
   },
   modifiers: [
@@ -857,9 +857,9 @@ interact('#nav').resizable({
 });
 if (Object.prototype.hasOwnProperty.call(config, 'filtersWidth')) {
   ((a, w) => {
-    a.style.width = (w > 24 ? w : 0) + 'px'; // the 24 and 12 must reflect the current padding!
+    a.style.width = `${w > 24 ? w : 0}px`; // the 24 and 12 must reflect the current padding!
     // a.style.paddingLeft = a.style.paddingRight = (w > 24 ? 12 : Math.max(w / 2, 2)) + 'px';
-    a.style.color = w > 24 ? '' : 'rgba(0,0,0,' + Math.max((w - 10) * 0.05, 0) + ')';
+    a.style.color = w > 24 ? '' : `rgba(0,0,0,${Math.max((w - 10) * 0.05, 0)})`;
     if (a.children[1].children[0].tagName === 'UL') {
       a.children[1].children[0].style.gridTemplateColumns = w > 290 ? 'auto 1fr' : 'auto';
       a.children[1].children[0].style.rowGap = w > 290 ? '6px' : '0';
@@ -874,9 +874,9 @@ interact('#filters-props').resizable({
         config.filtersWidth = Math.round(event.rect.width);
         debouncedConfigSync();
       }
-      event.target.style.width = (event.rect.width > 24 ? event.rect.width : 0) + 'px'; // the 24 and 12 must reflect the current padding!
+      event.target.style.width = `${event.rect.width > 24 ? event.rect.width : 0}px`; // the 24 and 12 must reflect the current padding!
       // event.target.style.paddingLeft = event.target.style.paddingRight = (event.rect.width > 24 ? 12 : Math.max(event.rect.width / 2, 2)) + 'px';
-      event.target.style.color = event.rect.width > 24 ? '' : 'rgba(0,0,0,' + Math.max((event.rect.width - 10) * 0.05, 0) + ')';
+      event.target.style.color = event.rect.width > 24 ? '' : `rgba(0,0,0,${Math.max((event.rect.width - 10) * 0.05, 0)})`;
       if (event.target.children[1].children[0].tagName === 'UL') {
         event.target.children[1].children[0].style.gridTemplateColumns = event.rect.width > 290 ? 'auto 1fr' : 'auto';
         event.target.children[1].children[0].style.rowGap = event.rect.width > 290 ? '6px' : '0';
@@ -1384,7 +1384,7 @@ const vm = new Vue({
               return {
                 '--color': this.filter[1].color,
                 '--icon-color': hexToHSL(this.filter[1].color)[2] > 50 ? '#111' : '#fff',
-                '--icon-focus-color': 'hsl(' + ((hexToHSL(this.filter[1].color)[0] + 180) % 360) + ', 87%, 56%)'
+                '--icon-focus-color': `hsl(${(hexToHSL(this.filter[1].color)[0] + 180) % 360}, 87%, 56%)`
               };
             default:
               return {};
@@ -1465,7 +1465,7 @@ const vm = new Vue({
           } else if (this.filter[1] === 'Resolution') {
             this.$emit('add-self', ['propResolution', { condition: this.comparisonType, val: [this.value, this.value2], inclNoval: this.inclNoval }]);
           } else {
-            this.$emit('add-self', ['prop' + this.filter[1], this.filter[1] === 'Boolean' ? { positive: true, prop: this.filter[0], inclNoval: this.inclNoval } : { prop: this.filter[0], condition: this.comparisonType, val: this.value, inclNoval: this.inclNoval, caseSensitive: this.caseSensitive }]);
+            this.$emit('add-self', [`prop${this.filter[1]}`, this.filter[1] === 'Boolean' ? { positive: true, prop: this.filter[0], inclNoval: this.inclNoval } : { prop: this.filter[0], condition: this.comparisonType, val: this.value, inclNoval: this.inclNoval, caseSensitive: this.caseSensitive }]);
           }
         },
         addSelfNegative: function () { // only for boolean
@@ -1668,7 +1668,7 @@ const vm = new Vue({
         if (fs.readdirSync(creationdir).length > 0 && fallbackRef(config, 'showDirWarning', true)) {
           dialog.showMessageBox(app.getCurrentWindow(), {
             type: 'warning',
-            message: 'The directory you selected ("' + creationdir + ') is not empty. If you meant to create a new TagSpace within this directory, create the folder within the New TagSpace dialog and use that. If you have photos in this folder that you want to convert to a TagSpace, create a TagSpace in another directory and add the photos when prompted. Select Okay to delete all contents of the directory, or Cancel.',
+            message: `The directory you selected ("${creationdir}) is not empty. If you meant to create a new TagSpace within this directory, create the folder within the New TagSpace dialog and use that. If you have photos in this folder that you want to convert to a TagSpace, create a TagSpace in another directory and add the photos when prompted. Select Okay to delete all contents of the directory, or Cancel.`,
             buttons: ['Cancel', 'Okay'],
             defaultId: 0,
             cancelId: 0,
@@ -1761,7 +1761,7 @@ const vm = new Vue({
       if (fallbackRef(cache, 'showDeleteWarning', true)) {
         dialog.showMessageBox(app.getCurrentWindow(), {
           title: 'Deletion Confirmation',
-          message: 'Would you really like to delete the current media? This is revokable (the media file will be moved to ' + (process.platform === 'win32' ? 'the Recycle Bin' : process.platform === 'linux' ? 'the Wastebasket' : 'Trash') + ') but the metadata (tags and properties) will be lost permanently for this media. Note: TagViewer will not delete the original media file.',
+          message: `Would you really like to delete the current media? This is revokable (the media file will be moved to ${process.platform === 'win32' ? 'the Recycle Bin' : process.platform === 'linux' ? 'the Wastebasket' : 'Trash'}) but the metadata (tags and properties) will be lost permanently for this media. Note: TagViewer will not delete the original media file.`,
           buttons: ['Cancel', 'Delete'],
           cancelId: 0,
           defaultId: 0,
