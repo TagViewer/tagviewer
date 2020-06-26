@@ -31,3 +31,6 @@ Contributions are welcome in the form of issues and pull requests. Some relevant
 - I use two spaces to indent, and if you don't like that, I don't know what to tell you.
 
 Pull requests should only make the minimum change required to fix the issue they address (whether that is a bug, enhancement, or something else).
+
+## Credits
+We appreciate Google's Material Icons as they play a prominent role in the user interface.
