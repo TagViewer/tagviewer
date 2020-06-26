@@ -1,2 +1,4 @@
 node_modules/
 .vscode/
+# auto-generated from LESS
+*.css
