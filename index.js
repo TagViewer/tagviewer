@@ -613,6 +613,22 @@ const secondarySort = (a, b, by, method) => {
       if (method === '19') return a.size - b.size;
       if (method === '91') return b.size - a.size;
       break;
+    case 'Resolution':
+      if (method === '19') {
+        return !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+          ? a.title.localeCompare(b.title) // compare their titles (tertiary sort)
+          : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1]) // if one has it but the other doesn't
+            ? b.resolution !== [-1, -1] - a.resolution !== [-1, -1] // put the one with it first.
+            : a.resolution[0] * a.resolution[1] - b.resolution[0] * b.resolution[1]; // otherwise compare total pixels
+      }
+      if (method === '91') {
+        return !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+          ? a.title.localeCompare(b.title) // compare their titles (tertiary sort)
+          : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1])
+            ? a.resolution !== [-1, -1] - b.resolution !== [-1, -1]
+            : b.resolution[0] * b.resolution[1] - a.resolution[0] * a.resolution[1];
+      }
+      break;
     default:
       if (method === 'az') { // a, A, b, B, ... z, Z, noval
         return !(Object.prototype.hasOwnProperty.call(a.props, by) || Object.prototype.hasOwnProperty.call(b.props, by)) || a.props[by] === b.props[by] // if they both don't have the property OR if their value for the property is equal...
@@ -677,6 +693,26 @@ const sortUsing = (arr, by, method, by2, method2) => {
     case 'Size':
       if (method === '19') return arr.concat().sort((a, b) => a.size === b.size ? secondarySort(a, b, by2, method2) : a.size - b.size);
       if (method === '91') return arr.concat().sort((a, b) => b.size === a.size ? secondarySort(b, a, by2, method2) : b.size - a.size);
+      break;
+    case 'Resolution':
+      if (method === '19') {
+        return arr.concat().sort((a, b) =>
+          !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1]) // if no resolution info is present, the array will be [-1, -1]. Use that instead of hasOwnProperty to check for presence.
+            ? secondarySort(a, b, by2, method2) // if they both don't have it or if they're the same, use secondarySort
+            : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1]) // if one has it but the other doesn't
+              ? b.resolution !== [-1, -1] - a.resolution !== [-1, -1] // put the one with it first.
+              : a.resolution[0] * a.resolution[1] - b.resolution[0] * b.resolution[1] // otherwise compare total pixels
+        );
+      }
+      if (method === '91') {
+        return arr.concat().sort((a, b) => // same as above, but big goes before small
+          !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+            ? secondarySort(b, a, by2, method2)
+            : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1])
+              ? a.resolution !== [-1, -1] - b.resolution !== [-1, -1]
+              : b.resolution[0] * b.resolution[1] - a.resolution[0] * a.resolution[1]
+        );
+      }
       break;
     default:
       if (method === 'az') { // a, A, b, B, ... z, Z, noval
@@ -1380,13 +1416,15 @@ const vm = new Vue({
     canGoForward: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber < this.$store.getters.numOfFiles; },
     canGoToLast: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber < this.$store.getters.numOfFiles; },
     sortByOptions: function () {
-      return ['Intrinsic', 'Title', 'Size', ...this.$store.state.tagviewerMeta.propList.map(n => n[0])];
+      return ['Intrinsic', 'Title', 'Size', 'Resolution', ...this.$store.state.tagviewerMeta.propList.map(n => n[0])];
     },
     sortMethodOptions: function () {
       if (this.sortBy === 'Title') {
         return [{ name: 'A\u2013Z', value: 'az' }, { name: 'Z\u2013A', value: 'za' }];
       } else if (this.sortBy === 'Size') {
         return [{ name: '1\u20139', value: '19' }, { name: '9\u20131', value: '91' }];
+      } else if (this.sortBy === 'Resolution') {
+        return [{ name: '\u25fb\u2013\u2b1c', value: '19' }, { name: '\u2b1c\u2013\u25fb', value: '91' }];
       } else if (this.sortBy === 'Intrinsic') {
         return [];
       } else {
@@ -1398,8 +1436,8 @@ const vm = new Vue({
       }
     },
     sortBy2Options: function () {
-      if (this.sortBy !== 'Intrinsic' && this.sortBy !== 'Title' && this.sortBy !== 'Size' && this.sortMethodOptions.map(n => n.value).includes(this.sortMethod)) {
-        const newArr = ['Title', 'Size', ...this.$store.state.tagviewerMeta.propList.map(n => n[0])]; // same as sortByOptions but don't include the already selected option.
+      if (this.sortBy !== 'Intrinsic' && this.sortBy !== 'Title' && this.sortMethodOptions.map(n => n.value).includes(this.sortMethod)) {
+        const newArr = ['Title', 'Size', 'Resolution', ...this.$store.state.tagviewerMeta.propList.map(n => n[0])]; // same as sortByOptions but don't include the already selected option.
         newArr.splice(newArr.indexOf(this.sortBy), 1);
         return newArr;
       } else {
@@ -1411,6 +1449,8 @@ const vm = new Vue({
         return [{ name: 'A\u2013Z', value: 'az' }, { name: 'Z\u2013A', value: 'za' }];
       } else if (this.sortBy2 === 'Size') {
         return [{ name: '1\u20139', value: '19' }, { name: '9\u20131', value: '91' }];
+      } else if (this.sortBy === 'Resolution') {
+        return [{ name: '\u25fb\u2013\u2b1c', value: '19' }, { name: '\u2b1c\u2013\u25fb', value: '91' }];
       } else if (this.sortBy2 === '') {
         return [];
       } else {
