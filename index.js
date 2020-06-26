@@ -945,7 +945,7 @@ const store = new Vuex.Store({
       return newValue;
     },
     tagspaceIsOpen: state => state.openDirectory !== '',
-    mediaIsOpen: (state, getters) => getters.tagspaceIsOpen && ((getters.mediaPath !== '') || getters.filterActive),
+    mediaIsOpen: (state, getters) => getters.tagspaceIsOpen && (getters.mediaPath !== '' || getters.filtersActive),
     haveMediaOptions: (state, getters) => getters.mediaIsOpen && (getters.numOfFiles > 1 || getters.filtersActive),
     mediaPath: (state, getters) => {
       if (getters.tagspaceIsOpen && Array.prototype.hasOwnProperty.call(getters.currentFiles, state.mediaNumber - 1)) {
@@ -1420,7 +1420,7 @@ const vm = new Vue({
   </select>
   <input v-if="filter[1] !== 'Boolean'" :type="inputType" v-model="value">
   <span v-if="filter[1] === 'Resolution'">&times;</span>
-  <input v-if="filter[1] === 'Resolution' v-model="value2" type="number">
+  <input v-if="filter[1] === 'Resolution'" v-model="value2" type="number">
   <select v-if="filter[1] === 'Size'" v-model="value2">
     <option value="0">B</option>
     <option value="3">kB</option>
