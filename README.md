@@ -1,5 +1,5 @@
 # TagViewer
-![Version badge](https://img.shields.io/github/package-json/v/tagviewer/tagviewer) ![Latest release](https://img.shields.io/github/v/release/tagviewer/tagviewer?sort=semver) ![Commits since latest release](https://img.shields.io/github/commits-since/tagviewer/tagviewer/latest/master*?sort=semver)
+![Version badge](https://img.shields.io/github/package-json/v/tagviewer/tagviewer) ![Latest release](https://img.shields.io/github/v/release/tagviewer/tagviewer?sort=semver) ![Commits since latest release](https://img.shields.io/github/commits-since/tagviewer/tagviewer/latest/master*?sort=semver)     
 TagViewer is a simple program that allows viewing of media within a TagSpace, and rich filtering of that media with tags and properties that are stored by the program. You can also sort by values of properties or presence of tags, as well as show the media in a slideshow.
 #### You should use TagViewer if:
 
@@ -13,7 +13,7 @@ TagViewer is a simple program that allows viewing of media within a TagSpace, an
  - Extra metadata isn't important or necessary for your use case
  - You don't like Node/Electron apps
 ## License
-![License badge](https://img.shields.io/badge/license-GPL%203.0-blue)
+![License badge](https://img.shields.io/badge/license-GPL%203.0-blue)    
 TagViewer Copyright © 2020  Matt Fellenz
 This program comes with ABSOLUTELY NO WARRANTY; read the license for more details. This is free software, and you are welcome to redistribute it under certain conditions, as outlined in the license.
 
