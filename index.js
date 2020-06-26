@@ -437,10 +437,6 @@ if (Object.prototype.hasOwnProperty.call(config, 'theme') && config.theme !== 'd
  * @function
  */
 const applyFilters = (array, filters) => {
-  array.map((el, i) => { // add indices.
-    el._index = i;
-    return el;
-  });
   for (const filter of filters) {
     const filterFn = generateFilter(filter);
     array = array.filter(el => filterFn(el));
