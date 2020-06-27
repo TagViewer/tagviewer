@@ -33,7 +33,7 @@
       <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start-fs" title="Slideshow (Fullscreen)" aria-label="Start a Slideshow in Fullscreen mode" v-on:click="startSlideshowFS"><i class="material-icons" style="transform:scale(1.05)">slideshow</i></button>
       <button type="button" :disabled="!haveMediaOptions || slideshowInterval === null" id="slideshow-end" title="End Slideshow" aria-label="End the Slideshow" v-on:click="endSlideshow"><i class="material-icons">stop</i></button>
       <div class="divider"></div>
-      <button type="button" :disabled="!tagspaceIsOpen" id="edit-tagspace" title="Configure TagSpace" aria-label="Configure the current TagSpace." v-on:click="configureTagSpaceDialog"><i class="material-icons">edit</i></button>
+      <button type="button" :disabled="!tagspaceIsOpen" id="edit-tagspace" title="Configure TagSpace" aria-label="Configure the current Tag Space." v-on:click="configureTagSpaceDialog"><i class="material-icons">edit</i></button>
       <button type="button" id="settings" title="Settings" aria-label="Tag Viewer Settings" v-on:click="settingsDialog"><i class="material-icons">settings</i></button>
       <button type="button" id="about" title="About TagViewer" aria-label="About Tag Viewer" v-on:click="aboutDialog"><i class="material-icons">info</i></button>
       <button type="button" id="help" title="TagViewer Help" aria-label="Get Help operating this application" v-on:click="helpDialog"><i class="material-icons">help</i></button>
