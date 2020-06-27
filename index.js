@@ -1187,18 +1187,19 @@ const vm = new Vue({
   },
   watch: {
     filterQuake: function (active) {
+      const filterQuakeEl = document.getElementById('filter-quake');
       if (active) {
-        document.getElementById('filter-quake').children[0].select();
+        filterQuakeEl.children[1].select();
         document.body.children[0].addEventListener('click', function (e) {
-          if (!e.path.includes(document.getElementById('filter-quake'))) {
+          if (!e.path.includes(filterQuakeEl)) {
             e.preventDefault();
             vm.filterQuake = false;
           }
         });
-        document.getElementById('filter-quake').children[0].addEventListener('input', function () {
+        filterQuakeEl.children[1].addEventListener('input', function () {
           if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
         });
-        document.getElementById('filter-quake').children[0].addEventListener('keydown', function (e) {
+        filterQuakeEl.children[1].addEventListener('keydown', function (e) {
           if (e.key === 'Escape') vm.filterQuake = false;
           if (e.key === 'Enter') {
             const result = parseFilter(vm.tentativeFilterText);
@@ -1223,16 +1224,16 @@ const vm = new Vue({
           }
         });
       } else {
-        document.body.children[0].removeEventListener('click', function (e) {
-          if (!e.path.includes(document.getElementById('filter-quake'))) {
+        document.body.children[1].removeEventListener('click', function (e) {
+          if (!e.path.includes(filterQuakeEl)) {
             e.preventDefault();
             vm.filterQuake = false;
           }
         });
-        document.getElementById('filter-quake').children[0].removeEventListener('input', function () {
+        filterQuakeEl.children[1].removeEventListener('input', function () {
           if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
         });
-        document.getElementById('filter-quake').children[0].removeEventListener('keydown', function (e) {
+        filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
           if (e.key === 'Escape') vm.filterQuake = false;
           if (e.key === 'Enter') {
             const result = parseFilter(vm.tentativeFilterText);
