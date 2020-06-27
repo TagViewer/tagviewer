@@ -1229,6 +1229,55 @@ const vm = new Vue({
           }
         });
         filterQuakeEl.children[1].addEventListener('input', function () {
+          let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
+          let options = [];
+          if (processed.includes('+') || processed.includes('-')) {
+            processed = processed.slice(1);
+            if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
+              options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
+              if (options.length !== 0) { // if there are any
+                vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
+              } else {
+                vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
+              }
+            } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
+              if (processed.slice(0, 4) === 'prop') { // property filter
+                processed = processed.slice(5); // remove 'prop:'
+                if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
+                  options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
+                  if (options.length !== 0) { // same as above
+                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
+                  } else {
+                    vm.autocompleteFilterText = '';
+                  }
+                } else { // they're typing the value, leave them alone.
+                  vm.autocompleteFilterText = '';
+                }
+              } else { // tag/tagColor filter
+                if (processed.startsWith('tag:')) {
+                  processed = processed.slice(4); // remove 'tag:'
+                  options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
+                  if (options.length !== 0) {
+                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
+                  } else {
+                    vm.autocompleteFilterText = '';
+                  }
+                } else if (processed.startsWith('tagColor:')) {
+                  processed = processed.slice(9);
+                  options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
+                  if (options.length !== 0) {
+                    vm.autocompleteFilterText = options[0][1].slice(processed.length);
+                  } else {
+                    vm.autocompleteFilterText = '';
+                  }
+                } else { // don't know what they're doing, leave them alone.
+                  vm.autocompleteFilterText = '';
+                }
+              }
+            }
+          } else { // they have nothing, do nothing.
+            vm.autocompleteFilterText = '';
+          }
           if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
         });
         filterQuakeEl.children[1].addEventListener('keydown', function (e) {
@@ -1264,6 +1313,55 @@ const vm = new Vue({
           }
         });
         filterQuakeEl.children[1].removeEventListener('input', function () {
+          let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
+          let options = [];
+          if (processed.includes('+') || processed.includes('-')) {
+            processed = processed.slice(1);
+            if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
+              options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
+              if (options.length !== 0) { // if there are any
+                vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
+              } else {
+                vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
+              }
+            } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
+              if (processed.slice(0, 4) === 'prop') { // property filter
+                processed = processed.slice(5); // remove 'prop:'
+                if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
+                  options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
+                  if (options.length !== 0) { // same as above
+                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
+                  } else {
+                    vm.autocompleteFilterText = '';
+                  }
+                } else { // they're typing the value, leave them alone.
+                  vm.autocompleteFilterText = '';
+                }
+              } else { // tag/tagColor filter
+                if (processed.startsWith('tag:')) {
+                  processed = processed.slice(4); // remove 'tag:'
+                  options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
+                  if (options.length !== 0) {
+                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
+                  } else {
+                    vm.autocompleteFilterText = '';
+                  }
+                } else if (processed.startsWith('tagColor:')) {
+                  processed = processed.slice(9);
+                  options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
+                  if (options.length !== 0) {
+                    vm.autocompleteFilterText = options[0][1].slice(processed.length);
+                  } else {
+                    vm.autocompleteFilterText = '';
+                  }
+                } else { // don't know what they're doing, leave them alone.
+                  vm.autocompleteFilterText = '';
+                }
+              }
+            }
+          } else { // they have nothing, do nothing.
+            vm.autocompleteFilterText = '';
+          }
           if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
         });
         filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
