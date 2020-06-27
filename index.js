@@ -1555,7 +1555,7 @@ const vm = new Vue({
               return {
                 '--color': this.filter[1].color,
                 '--icon-color': hexToHSL(this.filter[1].color)[2] > 50 ? '#111' : '#fff',
-                '--icon-focus-color': `hsl(${(hexToHSL(this.filter[1].color)[0] + 180) % 360}, 87%, 56%)`
+                '--icon-focus-color': ((h, p) => (h - 8 < p[0] && (h + 8) % 360 > p[0]) ? `hsl(${(p[0] + 180) % 360}deg, ${p[1]}%, ${p[2]}%)` : 'var(--focus-color)')(hexToHSL(this.filter[1].color)[0], hexToHSL(window.getComputedStyle(document.documentElement).getPropertyValue('--focus-color').trim()))
               };
             default:
               return {};
