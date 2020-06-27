@@ -308,13 +308,6 @@ function hexToHSL (H) { // credit CSS Tricks
   return [h, s, l];
 }
 /**
- * Try to get key from an object, but return fallback if not available.
- * @param {(object|array)} obj - The object (or arrays)
- * @param {(string|number)} key - The key (can be a number in the case of an array)
- * @param {any} fallback - Fallback value if the key is not present in the object.
- */
-const fallbackRef = (obj, key, fallback) => Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : fallback;
-/**
  * Clamp the number (if n's below min, return min, and vice versa for max, otherwise return n)
  * @param {number} min - The minimum
  * @param {number} n - The number
@@ -411,14 +404,14 @@ const setInterfaceTheme = theme => {
       '--focus-color': '#f0c37af7',
       '--error-color': '#f77e7e'
     }
-  }[theme]), fallbackRef(config, 'themeOverrides', {}))).forEach((value, key) => document.documentElement.style.setProperty(key, value));
+  }[theme]), config.themeOverrides ?? {})).forEach((value, key) => document.documentElement.style.setProperty(key, value));
   try { document.getElementById('style-injector').remove(); } catch (e) { /* null check operator, where are you when I need you? */ }
   const styleInjector = document.createElement('STYLE');
   styleInjector.id = 'style-injector';
   styleInjector.appendChild(document.createTextNode({
     'default-light': '',
     'default-dark': 'body > div #top-bar > button { outline: 0; }'
-  }[theme] + fallbackRef(config, 'themeInjections', '')));
+  }[theme] + (config.themeInjections ?? '')));
   document.body.appendChild(styleInjector);
 };
 
@@ -468,9 +461,9 @@ const generateFilter = filter => {
       }
     case 'propBoolean': // args: positive as Boolean for whether to need true or false, inclNoval for what do if it's not defined.
       if (filter[1].positive) {
-        return n => fallbackRef(n.props, filter[1].prop, !!filter[1].inclNoval);
+        return n => (n.props[filter[1].prop] ?? !!filter[1].inclNoval);
       } else {
-        return n => !fallbackRef(n.props, filter[1].prop, !filter[1].inclNoval);
+        return n => !(n.props[filter[1].prop] ?? !filter[1].inclNoval);
       }
     case 'propSize':
       if (filter[1].condition === '=') {
@@ -514,58 +507,58 @@ const generateFilter = filter => {
       break;
     case 'propNumber': // args: condition as String representing comparison, prop as String for the prop, val as Number for the value (includes Size) (and this is also for numericals like Size, Dimension, and Duration since they're stored in one unit—bytes, millimeters, and seconds respectively)
       if (filter[1].condition === '=') {
-        return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : NaN) === parseInt(filter[1].val, 10));
+        return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN)) === parseInt(filter[1].val, 10));
       }
       if (filter[1].condition === '>') {
-        return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val + 1 : NaN) > parseInt(filter[1].val, 10));
+        return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val + 1 : NaN)) > parseInt(filter[1].val, 10));
       }
       if (filter[1].condition === '<') {
-        return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val - 1 : NaN) < parseInt(filter[1].val, 10));
+        return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val - 1 : NaN)) < parseInt(filter[1].val, 10));
       }
       if (filter[1].condition === '!=' || filter[1].condition === '≠') {
-        return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? NaN : parseInt(filter[1].val, 10)) !== parseInt(filter[1].val, 10));
+        return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? NaN : parseInt(filter[1].val, 10))) !== parseInt(filter[1].val, 10));
       }
       if (filter[1].condition === '<=' || filter[1].condition === '≤') {
-        return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : NaN) <= parseInt(filter[1].val, 10));
+        return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN)) <= parseInt(filter[1].val, 10));
       }
       if (filter[1].condition === '>=' || filter[1].condition === '≥') {
-        return n => (fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : NaN) >= parseInt(filter[1].val, 10));
+        return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN)) >= parseInt(filter[1].val, 10));
       }
       break;
     case 'propString': // args: same but condition can only be = or !=, and val is a String (includes Title comparisons)
       if (!filter[1].caseSensitive) {
         if (filter[1].condition === '=') {
-          return n => ((filter[1].prop === 'Title' ? n.title.toLowerCase() : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : NaN)).toLowerCase() === filter[1].val.toLowerCase());
+          return n => ((filter[1].prop === 'Title' ? n.title.toLowerCase() : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN))).toLowerCase() === filter[1].val.toLowerCase());
         }
         if (filter[1].condition === '!=' || filter[1].condition === '≠') {
-          return n => !((filter[1].prop === 'Title' ? n.title.toLowerCase() : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? NaN : filter[1].val)) === filter[1].val.toLowerCase());
+          return n => !((filter[1].prop === 'Title' ? n.title.toLowerCase() : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? NaN : filter[1].val))) === filter[1].val.toLowerCase());
         }
         if (filter[1].condition === '{}' || filter[1].condition === 'includes') { // contains
-          return n => ((filter[1].prop === 'Title' ? n.title.toLowerCase() : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : '')).includes(filter[1].val.toLowerCase()));
+          return n => ((filter[1].prop === 'Title' ? n.title.toLowerCase() : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : ''))).includes(filter[1].val.toLowerCase()));
         }
         if (filter[1].condition === '!{' || filter[1].condition === "doesn't include") { // doesn't contain
-          return n => !((filter[1].prop === 'Title' ? n.title.toLowerCase() : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? '' : filter[1].val)).includes(filter[1].val.toLowerCase()));
+          return n => !((filter[1].prop === 'Title' ? n.title.toLowerCase() : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? '' : filter[1].val))).includes(filter[1].val.toLowerCase()));
         }
       } else {
         if (filter[1].condition === '=' || filter[1].condition === 'is same as') {
-          return n => ((filter[1].prop === 'Title' ? n.title : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : NaN)) === filter[1].val);
+          return n => ((filter[1].prop === 'Title' ? n.title : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN))) === filter[1].val);
         }
         if (filter[1].condition === '!=' || filter[1].condition === 'is not same as') {
-          return n => !((filter[1].prop === 'Title' ? n.title : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? NaN : filter[1].val)) === filter[1].val);
+          return n => !((filter[1].prop === 'Title' ? n.title : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? NaN : filter[1].val))) === filter[1].val);
         }
         if (filter[1].condition === '{}' || filter[1].condition === 'includes') { // contains
-          return n => ((filter[1].prop === 'Title' ? n.title : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? filter[1].val : '')).includes(filter[1].val));
+          return n => ((filter[1].prop === 'Title' ? n.title : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : ''))).includes(filter[1].val));
         }
         if (filter[1].condition === '!{' || filter[1].condition === "doesn't include") { // doesn't contain
-          return n => !((filter[1].prop === 'Title' ? n.title : fallbackRef(n.props, filter[1].prop, filter[1].inclNoval ? '' : filter[1].val)).includes(filter[1].val));
+          return n => !((filter[1].prop === 'Title' ? n.title : (n.props[filter[1].prop] ?? (filter[1].inclNoval ? '' : filter[1].val))).includes(filter[1].val));
         }
       }
       break;
     case 'propList': // supports inclusions and exclusions only so far
       if (filter[1].positive) { // no such thing as Noval for a list
-        return n => (fallbackRef(n.props, filter[1].prop, []).includes(filter[1].val));
+        return n => ((n.props[filter[1].prop] ?? ([])).includes(filter[1].val));
       } else {
-        return n => !(fallbackRef(n.props, filter[1].prop, []).includes(filter[1].val));
+        return n => !((n.props[filter[1].prop] ?? ([])).includes(filter[1].val));
       }
   }
 };
@@ -871,7 +864,7 @@ interact('#nav').resizable({
   edges: { right: true, left: false, top: false, bottom: false },
   listeners: {
     move (event) {
-      if (!fallbackRef(config, 'noSaveWidths', false)) {
+      if (!(config.noSaveWidths ?? (false))) {
         config.navWidth = Math.round(event.rect.width);
         debouncedConfigSync();
       }
@@ -901,7 +894,7 @@ interact('#filters-props').resizable({
   edges: { right: false, left: true, top: false, bottom: false },
   listeners: {
     move (event) {
-      if (!fallbackRef(config, 'noSaveWidths', false)) {
+      if (!(config.noSaveWidths ?? (false))) {
         config.filtersWidth = Math.round(event.rect.width);
         debouncedConfigSync();
       }
@@ -1092,7 +1085,7 @@ const store = new Vuex.Store({
           ...(state.tagviewerMeta.propList.map(n => {
             const ret = [];
             ret[0] = n[0];
-            ret[1] = fallbackRef(currentFileJSON.props, n[0], null); // it becomes [...[name, value, type]]
+            ret[1] = (currentFileJSON.props[n[0]] ?? (null)); // it becomes [...[name, value, type]]
             ret[2] = n[1];
             return ret;
           }))
@@ -1110,7 +1103,7 @@ const store = new Vuex.Store({
           ...(state.tagviewerMeta.propList.map(n => {
             const ret = [];
             ret[0] = n[0];
-            ret[1] = fallbackRef(currentFileJSON.props, n[0], null); // it becomes [...[name, value, type]]
+            ret[1] = (currentFileJSON.props[n[0]] ?? (null)); // it becomes [...[name, value, type]]
             ret[2] = n[1];
             return ret;
           }))
@@ -1200,7 +1193,7 @@ const vm = new Vue({
   store: store,
   el: '#vue-container',
   data: {
-    offeringPreviousLocation: fallbackRef(config, 'offerPrevLocation', true) && Object.prototype.hasOwnProperty.call(cache, 'openDirectory') && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')),
+    offeringPreviousLocation: (config.offerPrevLocation ?? (true)) && Object.prototype.hasOwnProperty.call(cache, 'openDirectory') && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')),
     asideTab: 1,
     tentativeFilterText: '',
     autocompleteFilterText: '',
@@ -1402,7 +1395,7 @@ const vm = new Vue({
     },
     isFullscreen: function (isFS) {
       if (isFS) document.addEventListener('keydown', function handler (e) { if (e.key === 'Escape') { vm.isFullscreen = false; document.removeEventListener('keypress', handler); } });
-      if (!isFS && fallbackRef(config, 'endSlideshowOnFSExit', true)) vm.endSlideshow();
+      if (!isFS && (config.endSlideshowOnFSExit ?? (true))) vm.endSlideshow();
       window.document.body.classList.toggle('fullscreen', isFS);
       app.getCurrentWindow().setFullScreen(isFS);
       app.getCurrentWindow().focus();
@@ -1836,7 +1829,7 @@ const vm = new Vue({
       if (typeof creationdir !== 'undefined') {
         creationdir = creationdir[0];
         ipcRenderer.sendSync('storeValue', ['creationdir', creationdir]);
-        if (fs.readdirSync(creationdir).length > 0 && fallbackRef(config, 'showDirWarning', true)) {
+        if (fs.readdirSync(creationdir).length > 0 && (config.showDirWarning ?? (true))) {
           dialog.showMessageBox(app.getCurrentWindow(), {
             type: 'warning',
             message: `The directory you selected ("${creationdir}) is not empty. If you meant to create a new TagSpace within this directory, create the folder within the New TagSpace dialog and use that. If you have photos in this folder that you want to convert to a TagSpace, create a TagSpace in another directory and add the photos when prompted. Select Okay to delete all contents of the directory, or Cancel.`,
@@ -1929,7 +1922,7 @@ const vm = new Vue({
     viewMediaExternal: function () { app.shell.openPath(this.$store.getters.mediaPath); },
     deleteMedia: function () {
       if (!Object.prototype.hasOwnProperty.call(this.$store.getters.currentFileJSON, '_index')) console.error('_index not found in current file.');
-      if (fallbackRef(cache, 'showDeleteWarning', true)) {
+      if ((cache.showDeleteWarning ?? (true))) {
         dialog.showMessageBox(app.getCurrentWindow(), {
           title: 'Deletion Confirmation',
           message: `Would you really like to delete the current media? This is revokable (the media file will be moved to ${process.platform === 'win32' ? 'the Recycle Bin' : process.platform === 'linux' ? 'the Wastebasket' : 'Trash'}) but the metadata (tags and properties) will be lost permanently for this media. Note: TagViewer will not delete the original media file.`,
@@ -2104,8 +2097,8 @@ const vm = new Vue({
     },
     startSlideshow: function () {
       this.slideshowInterval = this.slideshowInterval === null ? window.setInterval(function () {
-        if (vm.canGoForward) vm.goToNextMedia(); else if (!fallbackRef(config, 'stopSlideshowAtEnd', false)) vm.goToFirstMedia(); else vm.endSlideshow();
-      }, fallbackRef(config, 'slideshowInterval', 1000)) : this.slideshowInterval;
+        if (vm.canGoForward) vm.goToNextMedia(); else if (!(config.stopSlideshowAtEnd ?? (false))) vm.goToFirstMedia(); else vm.endSlideshow();
+      }, (config.slideshowInterval ?? (1000))) : this.slideshowInterval;
     },
     startSlideshowFS: function () {
       this.isFullscreen = true;
@@ -2115,14 +2108,14 @@ const vm = new Vue({
       if (this.slideshowInterval !== null) { window.clearInterval(this.slideshowInterval); this.slideshowInterval = null; }
     },
     invertColors: function () {
-      if (fallbackRef(config, 'theme', 'default-light') === 'default-light') config.theme = 'default-dark'; else config.theme = 'default-light';
+      if ((config.theme ?? ('default-light')) === 'default-light') config.theme = 'default-dark'; else config.theme = 'default-light';
       setInterfaceTheme(config.theme);
       debouncedConfigSync();
     }
   }
 });
 
-if (Object.prototype.hasOwnProperty.call(cache, 'openDirectory') && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')) && fallbackRef(config, 'resumeSessionOnRestart', false)) vm.openPreviousTagspace();
+if (Object.prototype.hasOwnProperty.call(cache, 'openDirectory') && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')) && (config.resumeSessionOnRestart ?? (false))) vm.openPreviousTagspace();
 
 ipcRenderer.on('tagDeleted', function (e, index) {
   store.dispatch('tagDeleted', index);
