@@ -1256,6 +1256,7 @@ const vm = new Vue({
           }
         });
       } else {
+        setTimeout(() => (vm.errorText = ''), 300);
         document.body.children[1].removeEventListener('click', function (e) {
           if (!e.path.includes(filterQuakeEl)) {
             e.preventDefault();
@@ -1271,8 +1272,8 @@ const vm = new Vue({
             const result = parseFilter(vm.tentativeFilterText);
             if (result.err) { vm.errorText = result.value; } else {
               store.dispatch('replaceFilter', result.value);
+              vm.filterQuake = false;
             }
-            vm.filterQuake = false;
           }
         });
         filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
@@ -1281,8 +1282,8 @@ const vm = new Vue({
             const result = parseFilter(vm.tentativeFilterText);
             if (result.err) { vm.errorText = result.value; } else {
               store.dispatch('replaceFilter', result.value);
+              vm.filterQuake = false;
             }
-            vm.filterQuake = false;
           }
           if (e.key === 'ArrowRight') {
             if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
