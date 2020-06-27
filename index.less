@@ -584,6 +584,19 @@ body {
         font-size:1.4rem;
         box-sizing:border-box;
       }
+      & > span {
+        position: absolute;
+        font-size: 1.4rem;
+        padding: 2px 3px;
+        line-height: 1.25;
+        & > span:first-of-type {
+          visibility:hidden;
+        }
+        & > span:last-of-type {
+          color:var(--secondary-foreground-color);
+          opacity:0.7;
+        }
+      }
     }
   }
   &.fullscreen > div {

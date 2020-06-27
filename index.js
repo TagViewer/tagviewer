@@ -1172,6 +1172,7 @@ const vm = new Vue({
     offeringPreviousLocation: fallbackRef(config, 'offerPrevLocation', true) && Object.prototype.hasOwnProperty.call(cache, 'openDirectory') && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')),
     asideTab: 1,
     tentativeFilterText: '',
+    autocompleteFilterText: '',
     filterQuake: false,
     showExitPrompt: app.app.showExitPrompt,
     sortBy: 'Intrinsic',
@@ -1206,6 +1207,20 @@ const vm = new Vue({
             }
             vm.filterQuake = false;
           }
+          if (e.key === 'ArrowRight') {
+            if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
+              e.preventDefault();
+              vm.tentativeFilterText += vm.autocompleteFilterText;
+              vm.autocompleteFilterText = '';
+            }
+          }
+          if (e.key === 'Tab') {
+            if (vm.autocompleteFilterText !== '') {
+              e.preventDefault();
+              vm.tentativeFilterText += vm.autocompleteFilterText;
+              vm.autocompleteFilterText = '';
+            }
+          }
         });
       } else {
         document.body.children[0].removeEventListener('click', function (e) {
@@ -1225,6 +1240,30 @@ const vm = new Vue({
               store.dispatch('replaceFilter', result.value);
             }
             vm.filterQuake = false;
+          }
+        });
+        filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
+          if (e.key === 'Escape') vm.filterQuake = false;
+          if (e.key === 'Enter') {
+            const result = parseFilter(vm.tentativeFilterText);
+            if (result.err) { vm.errorText = result.value; } else {
+              store.dispatch('replaceFilter', result.value);
+            }
+            vm.filterQuake = false;
+          }
+          if (e.key === 'ArrowRight') {
+            if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
+              e.preventDefault();
+              vm.tentativeFilterText += vm.autocompleteFilterText;
+              vm.autocompleteFilterText = '';
+            }
+          }
+          if (e.key === 'Tab') {
+            if (vm.autocompleteFilterText !== '') {
+              e.preventDefault();
+              vm.tentativeFilterText += vm.autocompleteFilterText;
+              vm.autocompleteFilterText = '';
+            }
           }
         });
       }

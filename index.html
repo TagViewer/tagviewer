@@ -122,7 +122,10 @@
       <span v-if="mediaIsOpen && currentFileJSON !== null">{{ currentFileJSON.tags.length }} out of {{ $store.state.tagviewerMeta.tagList.length }} tags applied to this item.&#x00a0;&#x00a0;|&#x00a0;&#x00a0;{{ currentFilesJSON.length }} item{{ currentFilesJSON.length!==1 ? 's' : ''}} match{{ currentFilesJSON.length===1 ? 'es' : '' }} the filter out of {{ $store.state.tagviewerMeta.files.length }} in the TagSpace.&#x00a0;&#x00a0;|&#x00a0;&#x00a0;</span>
       <span v-if="tagspaceIsOpen">{{ showExitPrompt ? 'Saving changes to disk...' : 'All changes are saved to disk.' }}</span>
     </footer>
-    <div id="filter-quake" :aria-current="filterQuake"><input type="text" v-model="tentativeFilterText"></div></div>
+    <div id="filter-quake" :aria-current="filterQuake">
+      <span style="pointer-events:none;"><span>{{tentativeFilterText}}</span><span>{{autocompleteFilterText}}</span></span>
+      <input type="text" v-model="tentativeFilterText"></div>
+    </div>
     <script src="index.js" type="text/javascript"></script>
   </body>
 </html>
