@@ -608,8 +608,37 @@ const convertFilter = param => {
       if (!Array.prototype.map.call(store.getters.tagviewerMeta.tagList, el => el[1]).includes(param.substring(param.indexOf(':') + 1))) throw new ReferenceError('The color specified does not belong to any tags in this TagSpace. Check that it matches exactly.');
       return ['tagColor', { positive, color: param.substring(param.indexOf(':') + 1) }];
     case 'prop':
-      // TODO
-      break;
+    { let arglist = param.substring(param.indexOf(':') + 1).split(/<|>|=|<=|>=|!=|!{|{}/);
+      const propEntry = ['Title', 'Size', 'Resolution'].includes(arglist[0]) ? [arglist[0], { Title: 'String', Size: 'Size', Resolution: 'Resolution' }[arglist[0]]] : store.state.tagviewerMeta.propList.find(n => n[0] === arglist[0]);
+      if (typeof propEntry === 'undefined') throw new ReferenceError('The property specified does not exist in this TagSpace. You may need to check your spelling.');
+      if (propEntry[1] === 'Boolean') {
+        if (arglist.length > 1) throw new SyntaxError('A boolean property filter should not have a comparison.');
+        return ['propBoolean', { prop: arglist[0], positive, inclNoval: true }];
+      } else {
+        arglist.splice(1, 0, (param.substring(param.indexOf(':') + 1).match(/<|>|=|<=|>=|!=|!{|{}/)[0]));
+        if (arglist.length < 2) throw new SyntaxError('A property comparison was specified without a comparison operator ( <, >, =, <=, >=, !=, {}, or !{ ) present');
+        if (arglist.length > 2) arglist = [arglist[0], arglist[1], arglist.slice(2).join('')]; // if occurs, there's probably a comparison operator within the string
+        arglist[2] = removeQuotes(arglist[2]); // does nothing if there are no quotes.
+        if ((propEntry[1] === 'Number' && ['{}', '!{'].includes(arglist[1])) || (propEntry[1] === 'String' && ['<', '>', '>=', '<='].includes(arglist[1]))) throw new TypeError(`The comparison operator specified ("${arglist[1]}") does not match the type of the property specified ("${arglist[0]}" of type ${propEntry[1]}).`);
+        const computeOpposite = op => ({ '>': '<=', '<': '>=', '>=': '<', '<=': '>', '{}': '!{', '!{': '{}' }[op]);
+        const splitAt = (index, x) => [x.slice(0, index), x.slice(index)];
+        const fixType = (val, type) => (({
+          String: n => n.toString(),
+          Number: n => parseInt(n, 10),
+          Size: n =>
+            (([n, e]) =>
+              parseFloat(n) **
+              (10 * { b: 0, kb: 3, mb: 6, gb: 9, tb: 12 }[e.toLowerCase()])
+            )(
+              splitAt(
+                n.slice(-2, -1).toLowerCase() !== n.slice(-2, -1).toUpperCase() ? -2 : -1, n
+              )
+            ),
+          Resolution: n => n.split('x').map(n => parseInt(n, 10))
+        }[type])(val));
+        return [`prop${propEntry[1]}`, { prop: arglist[0], condition: positive ? arglist[1] : computeOpposite(arglist[1]), val: fixType(arglist[2], propEntry[1]), inclNoval: true }]; // need to add inclNoval support
+      }
+    }
   }
 };
 /**
