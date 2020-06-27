@@ -1205,8 +1205,8 @@ const vm = new Vue({
             const result = parseFilter(vm.tentativeFilterText);
             if (result.err) { vm.errorText = result.value; } else {
               store.dispatch('replaceFilter', result.value);
+              vm.filterQuake = false;
             }
-            vm.filterQuake = false;
           }
           if (e.key === 'ArrowRight') {
             if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
