@@ -12,6 +12,7 @@ html { height:100%; }
   --icon-hover-shadow-string:0 0 3px 2px #f0c37aaa;
   --link-color:#3676e8;
   --focus-color:#f0af2f;
+  --error-color:#ff5252;
 }
 
 @keyframes shake {
@@ -583,6 +584,7 @@ body {
         height:100%;
         font-size:1.4rem;
         box-sizing:border-box;
+        display:block;
       }
       & > span {
         position: absolute;
@@ -596,6 +598,12 @@ body {
           color:var(--secondary-foreground-color);
           opacity:0.7;
         }
+      }
+      & > p {
+        color: var(--error-color);
+        display:block;
+        font-size:0.8rem;
+        margin-top:6px;
       }
     }
   }

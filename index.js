@@ -393,7 +393,8 @@ const setInterfaceTheme = theme => {
       '--icon-color_disabled': 'darkgrey',
       '--icon-hover-shadow-string': '0 0 3px 2px #0004',
       '--link-color': '#3676e8',
-      '--focus-color': '#f0af2f'
+      '--focus-color': '#f0af2f',
+      '--error-color': '#ff5252'
     },
     'default-dark': {
       '--root-font': 'sans-serif',
@@ -407,7 +408,8 @@ const setInterfaceTheme = theme => {
       '--icon-color_disabled': '#ddddddf7',
       '--icon-hover-shadow-string': '0 0 3px 2px #ffffffaa',
       '--link-color': '#96c6e0f7',
-      '--focus-color': '#f0c37af7'
+      '--focus-color': '#f0c37af7',
+      '--error-color': '#f77e7e'
     }
   }[theme]), fallbackRef(config, 'themeOverrides', {}))).forEach((value, key) => document.documentElement.style.setProperty(key, value));
   try { document.getElementById('style-injector').remove(); } catch (e) { /* null check operator, where are you when I need you? */ }
@@ -1173,6 +1175,7 @@ const vm = new Vue({
     asideTab: 1,
     tentativeFilterText: '',
     autocompleteFilterText: '',
+    errorText: '',
     filterQuake: false,
     showExitPrompt: app.app.showExitPrompt,
     sortBy: 'Intrinsic',

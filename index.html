@@ -124,7 +124,9 @@
     </footer>
     <div id="filter-quake" :aria-current="filterQuake">
       <span style="pointer-events:none;"><span>{{tentativeFilterText}}</span><span>{{autocompleteFilterText}}</span></span>
-      <input type="text" v-model="tentativeFilterText"></div>
+      <input type="text" v-model="tentativeFilterText">
+      <p>&#x00a0;{{errorText}}</p>
+    </div>
     </div>
     <script src="index.js" type="text/javascript"></script>
   </body>
