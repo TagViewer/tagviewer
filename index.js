@@ -37,7 +37,8 @@ const menuClick = item => {
     () => { if (vm.haveMediaOptions) vm.startSlideshow(); },
     () => { if (vm.haveMediaOptions) vm.startSlideshowFS(); },
     () => { if (vm.haveMediaOptions) vm.endSlideshow(); },
-    () => { vm.isFullscreen = !vm.isFullscreen; }
+    () => { vm.isFullscreen = !vm.isFullscreen; },
+    () => { if (!(vm.tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === '' || fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')))) vm.openPreviousTagspace(); }
   ][parseInt(item.id, 10)]();
 };
 const mainMenu = new app.Menu();
@@ -53,6 +54,12 @@ tagspaceMenu.append(new app.MenuItem({
   accelerator: 'CmdOrCtrl+O',
   label: 'Open TagSpace...',
   id: '1'
+}));
+tagspaceMenu.append(new app.MenuItem({
+  click: menuClick,
+  accelerator: 'CmdOrCtrl+Shift+O',
+  label: 'Open Previous TagSpace...',
+  id: '25'
 }));
 tagspaceMenu.append(new app.MenuItem({
   click: menuClick,
