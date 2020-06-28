@@ -976,7 +976,7 @@ const store = new Vuex.Store({
       return newValue;
     },
     tagspaceIsOpen: state => state.openDirectory !== '',
-    mediaIsOpen: (state, getters) => getters.tagspaceIsOpen && (getters.mediaPath !== '' || getters.filtersActive),
+    mediaIsOpen: (state, getters) => getters.tagspaceIsOpen && (getters.mediaPath !== '' || getters.filtersActive || state.tagviewerMeta.files.length === 0),
     haveMediaOptions: (state, getters) => getters.mediaIsOpen && (getters.numOfFiles > 1 || getters.filtersActive),
     mediaPath: (state, getters) => {
       if (getters.tagspaceIsOpen && Array.prototype.hasOwnProperty.call(getters.currentFiles, state.mediaNumber - 1)) {
