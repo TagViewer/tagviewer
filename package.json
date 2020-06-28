@@ -1,6 +1,6 @@
 {
   "name": "tagviewer",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags. Sorting is also implemented.",
   "main": "main.js",
   "dependencies": {
