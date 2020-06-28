@@ -133,7 +133,6 @@ new Vue({
         for (const i in fileList) {
           const file = fileList[i];
           fs.copyFileSync(file, path.join(creationdir, i + path.extname(file))); // should this be synchronous?
-          //                           |-> eg 1.png, 2.jpg         |-> maybe don't need whole path?          in bytes
           this.tagviewerData.files[i] = {
             _index: i,
             _path: i + path.extname(file),
@@ -144,11 +143,9 @@ new Vue({
             size: fs.statSync(file).size,
             resolution: ((['.flac', '.mp4', '.webm', '.wav'].includes(path.extname(file))) ? [-1, -1] : (a => [a.width, a.height])(imageSize(file)))
           };
-          //                                                                                          as an array of text, then colors as hex
         }
       }
       this.tagviewerData.currentIndex = fileList.length;
-      //           causes problems if async
       fs.writeFile(path.join(creationdir, 'tagviewer.json'), JSON.stringify(this.tagviewerData, null, 2), () => ipcRenderer.send('doneCreating'));
     }
   }
