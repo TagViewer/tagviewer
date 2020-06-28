@@ -145,7 +145,7 @@ new Vue({
           };
         }
       }
-      this.tagviewerData.currentIndex = fileList.length;
+      this.tagviewerData.currentIndex = fileList !== undefined ? fileList.length : 0;
       fs.writeFile(path.join(creationdir, 'tagviewer.json'), JSON.stringify(this.tagviewerData, null, 2), () => ipcRenderer.send('doneCreating'));
     }
   }
