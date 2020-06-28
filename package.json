@@ -46,7 +46,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "ignore": ["^lib\/((?!min).)*$"]
+        "ignore": ["^lib\/((?!min).)*$", "^rawicons"]
       },
       "makers": [
         {
