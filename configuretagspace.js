@@ -36,10 +36,10 @@ new Vue({
       },
       computed: {
         nameInputId: function () {
-          return 'tagName' + this.ckey;
+          return `tagName${this.ckey}`;
         },
         colorInputId: function () {
-          return 'tagColor' + this.ckey;
+          return `tagColor${this.ckey}`;
         }
       },
       watch: {
@@ -82,10 +82,10 @@ new Vue({
       },
       computed: {
         nameInputId: function () {
-          return 'propName' + this.ckey;
+          return `propName${this.ckey}`;
         },
         typeInputId: function () {
-          return 'propType' + this.ckey;
+          return `propType${this.ckey}`;
         }
       },
       watch: {
