@@ -45,7 +45,9 @@
   "license": "GPL-3.0-only",
   "config": {
     "forge": {
-      "packagerConfig": {},
+      "packagerConfig": {
+        "ignore": ["^lib\/((?!min).)*$"]
+      },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
