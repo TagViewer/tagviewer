@@ -4,13 +4,19 @@
   "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags. Sorting is also implemented.",
   "main": "main.js",
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
     "fs-extra": "^9.0.0",
     "image-size": "^0.8.3",
     "trash": "^6.1.1"
   },
   "devDependencies": {
-    "electron": "^9.0.4",
+    "@electron-forge/cli": "^6.0.0-beta.52",
+    "@electron-forge/maker-deb": "^6.0.0-beta.52",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.52",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.52",
+    "@electron-forge/maker-zip": "^6.0.0-beta.52",
     "@linthtml/linthtml": "^0.4.1",
+    "electron": "^9.0.4",
     "eslint": "^7.3.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-node": "^11.1.0",
@@ -20,8 +26,10 @@
     "stylelint-config-standard": "^20.0.0"
   },
   "scripts": {
-    "start": "electron .",
-    "startdev": "NODE_ENV=development electron ."
+    "start": "electron-forge start",
+    "startdev": "NODE_ENV=development electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "keywords": [
     "tag",
@@ -34,5 +42,32 @@
     "organization"
   ],
   "author": "Matt Fellenz",
-  "license": "GPL-3.0-only"
+  "license": "GPL-3.0-only",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "tagviewer"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
 }
