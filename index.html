@@ -6,15 +6,15 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="index.css" rel="stylesheet">
     <link rel="license" href="https://opensource.org/licenses/GPL-3.0">
-    <script src="lib/vue.min.js"></script>
-    <script src="lib/vuex.min.js"></script>
-    <script src="lib/interact.min.js"></script>
+    <script src="lib/vue.js"></script>
+    <script src="lib/vuex.js"></script>
+    <script src="lib/interact.js"></script>
   </head>
   <body class="before-content-load"><div id="vue-container">
     <header id="top-bar">
       <button type="button" id="open-tagspace" title="Open TagSpace" aria-label="Open Tag Space" v-on:click="openTagspaceDialog"><i class="material-icons">folder</i></button>
       <button type="button" id="new-tagspace" title="New TagSpace" aria-label="New Tag Space" v-on:click="newTagspaceDialog"><i class="material-icons">create_new_folder</i></button>
-      <button type="button" :disabled="tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === ''" id="open-previous-tagspace" title="Open Previous TagSpace" aria-label="Open Previous Tag Space" v-on:click="openPreviousTagspace"><i class="material-icons">undo</i></button>
+      <button type="button" :disabled="tagspaceIsOpen || !(offeringPreviousLocation)" id="open-previous-tagspace" title="Open Previous TagSpace" aria-label="Open Previous Tag Space" v-on:click="openPreviousTagspace"><i class="material-icons">undo</i></button>
       <button type="button" :disabled="!tagspaceIsOpen" id="add-media" title="Add Media" aria-label="Add Media" v-on:click="addMediaDialog"><i class="material-icons">add_photo_alternate</i></button>
       <div class="divider"></div>
       <button type="button" :disabled="!canGoToFirst" id="first-media" title="First Media" aria-label="Back to First Media" v-on:click="goToFirstMedia"><i class="material-icons">first_page</i></button>
