@@ -52,7 +52,8 @@
       "packagerConfig": {
         "ignore": [
           "^lib/((?!min).)*$",
-          "^rawicons"
+          "^rawicons",
+          "^translatorphrases.txt"
         ]
       },
       "makers": [

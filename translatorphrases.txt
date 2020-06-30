@@ -1,0 +1,46 @@
+TagViewer
+Welcome to TagViewer!
+New TagSpace...
+Open Existing TagSpace...
+Open TagSpace...
+Open Previous TagSpace
+Open Previous TagSpace...
+Settings...
+About
+Help
+No TagSpace Open.
+Properties
+Filters
+TagSpace
+Media
+Filter
+App
+Add Media...
+Configure TagSpace...
+Replace Current Media...
+Delete Current Media
+Open Current Media Externally
+Go to First Media
+Go to Previous Media
+Go to...
+Go to Next Media
+Go to Last Media
+Start Slideshow
+Start Slideshow (Fullscreen)
+End Slideshow
+New Filter (text)...
+Edit Filter (UI)...
+Edit Filter (text)...
+Clear all Filters
+Fullscreen
+Zoom In
+Zoom Out
+Reset Zoom
+Toggle Fullscreen
+Close
+Settings (UI)
+Settings (JSON)
+About TagViewer
+
+Localization Notes:
+<your notes here>
