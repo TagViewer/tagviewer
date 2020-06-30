@@ -2,6 +2,7 @@
   "name": "tagviewer",
   "version": "1.0.0",
   "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
+  "repository": "https://github.com/tagviewer/tagviewer",
   "main": "main.js",
   "dependencies": {
     "electron-squirrel-startup": "^1.0.0",
