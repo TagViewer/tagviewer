@@ -32,7 +32,8 @@
     "start": "electron-forge start",
     "startdev": "NODE_ENV=development electron .",
     "package": "electron-forge package",
-    "make": "electron-forge make"
+    "make": "electron-forge make",
+    "make-debug": "DEBUG=electron-forge:*,electron-installer-flatpak,flatpak-bundler electron-forge make"
   },
   "keywords": [
     "tag",
@@ -49,39 +50,77 @@
   "config": {
     "forge": {
       "packagerConfig": {
-        "ignore": ["^lib\/((?!min).)*$", "^rawicons"]
+        "ignore": [
+          "^lib/((?!min).)*$",
+          "^rawicons"
+        ]
       },
       "makers": [
         {
           "name": "@electron-forge/maker-squirrel",
           "config": {
-            "name": "tagviewer"
+            "title": "TagViewer",
+            "name": "tagviewer",
+            "copyright": "TagViewer © 2020 Matt Fellenz",
+            "iconUrl": "icons/macwin/icon.ico",
+            "noMsi": false,
+            "setupExe": "tagviewerSetup.exe",
+            "setupMsi": "tagviewerSetup.msi",
+            "setupIcon": "icons/macwin/icon.ico"
           }
         },
         {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
+          "name": "@electron-forge/maker-zip"
         },
         {
           "name": "@electron-forge/maker-deb",
           "config": {
-            "productName": "TagViewer",
             "productDescription": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
             "version": "1.0.0",
-            "section": ["utils"],
+            "section": [
+              "utils",
+              "graphics"
+            ],
             "name": "tagviewer",
             "depends": [],
-            "categories": ["Utility"],
+            "categories": [
+              "Utility",
+              "Graphics"
+            ],
             "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
-            "genericName": "Media Viewer",
-            "icon": "icons/png/512x512.png"
+            "genericName": "Media Organizer",
+            "icon": "icons/png/512x512.png",
+            "homepage": "github.com/tagviewer/tagviewer",
+            "maintainer": "Matt Fellenz <mattf53190@gmail.com>"
           }
         },
         {
           "name": "@electron-forge/maker-rpm",
-          "config": {}
+          "config": {
+            "productDescription": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
+            "version": "1.0.0",
+            "section": [
+              "utils",
+              "graphics"
+            ],
+            "name": "tagviewer",
+            "categories": [
+              "Utility",
+              "Graphics"
+            ],
+            "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
+            "genericName": "Media Organizer",
+            "icon": "icons/png/512x512.png",
+            "license": "GPL-3.0-only",
+            "maintainer": "Matt Fellenz <mattf53190@gmail.com>"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-dmg",
+          "config": {
+            "icon": "icons/macwin/icon.icns",
+            "name": "TagViewer"
+          }
         }
       ]
     }
