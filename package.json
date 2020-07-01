@@ -63,7 +63,7 @@
             "title": "TagViewer",
             "name": "tagviewer",
             "copyright": "TagViewer © 2020 Matt Fellenz",
-            "iconUrl": "icons/macwin/icon.ico",
+            "iconUrl": "file://icons/macwin/icon.ico",
             "noMsi": false,
             "setupExe": "tagviewerSetup.exe",
             "setupMsi": "tagviewerSetup.msi",
