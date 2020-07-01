@@ -68,7 +68,8 @@
             "setupExe": "tagviewerSetup.exe",
             "setupMsi": "tagviewerSetup.msi",
             "setupIcon": "icons/macwin/icon.ico"
-          }
+          },
+          "platforms": ["win32", "linux"]
         },
         {
           "name": "@electron-forge/maker-zip"
