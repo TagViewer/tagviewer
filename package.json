@@ -59,7 +59,8 @@
           "^lib/((?!min).)*$",
           "^rawicons",
           "^translatorphrases.txt"
-        ]
+        ],
+        "executableName": "tagviewer"
       },
       "makers": [
         {
