@@ -1217,7 +1217,8 @@ const vm = new Vue({
     isFullscreen: false,
     tagSearchString: null,
     colorSearchString: null,
-    propSearchString: null
+    propSearchString: null,
+    filterListCollapsed: [false, false, false]
   },
   watch: {
     filterQuake: function (active) {

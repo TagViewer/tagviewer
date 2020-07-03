@@ -398,6 +398,9 @@ body {
               }
               &:hover {
                 animation:shake .7s ease both;
+                &:last-of-type > .material-icons {
+                  will-change: transform;
+                }
               }
               &:focus {
                 outline:none;
@@ -409,12 +412,24 @@ body {
               & > .material-icons {
                 transition:color .3s ease;
               }
+              &:last-of-type > .material-icons {
+                transition: transform .12s ease-in-out;
+              }
 
               padding:1px 4px;
             }
           }
           & > div {
             overflow-x:visible;
+            &[data-collapsed] {
+              & > div {
+                height:0;
+                overflow-y:hidden;
+              }
+              & > h3 > button:last-of-type > .material-icons {
+                transform: rotate(90deg);
+              }
+            }
           }
         }
         #current-filters {
