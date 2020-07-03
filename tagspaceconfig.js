@@ -29,10 +29,10 @@ const vm = new Vue({
       template: '<li><label style="padding-left:0;" :for="nameInputId">Name:</label><input type="text" v-model="name" :id="nameInputId" required><label :for="colorInputId">Color:</label><input required type="color" v-model.lazy="color" :id="colorInputId"><button type="button" @click="removeTag"><i class="material-icons">remove</i></button></li>',
       computed: {
         nameInputId: function () {
-          return 'tagName' + this.index;
+          return `tagName${this.index}`;
         },
         colorInputId: function () {
-          return 'tagColor' + this.index;
+          return `tagColor${this.index}`;
         },
         name: {
           get: function () { return this.tag[0]; },
@@ -52,10 +52,10 @@ const vm = new Vue({
       template: '<li><label style="padding-left:0" :for="nameInputId">Name:</label><input type="text" v-model="name" :id="nameInputId" required><label :for="typeInputId">Type:</label><select required v-model="type" :id="typeInputId"><option value="String">String</option><option value="Number">Number</option><option value="Boolean">Boolean (yes or no)</option></select><button type="button" @click="removeProp"><i class="material-icons">remove</i></button></li>',
       computed: {
         nameInputId: function () {
-          return 'propName' + this.index;
+          return `propName${this.index}`;
         },
         typeInputId: function () {
-          return 'propType' + this.index;
+          return `propType${this.index}`;
         },
         name: {
           get: function () {
