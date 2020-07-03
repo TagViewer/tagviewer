@@ -1,12 +1,13 @@
 html { height:100%; }
+
 :root { // here the theme variable defaults are defined.
-  --root-font: sans-serif;
-  --main-background-color: #fff;
-  --secondary-background-color: #f7f7f7;
-  --tertiary-background-color: #7f7f7f;
-  --main-foreground-color: #000;
+  --root-font:sans-serif;
+  --main-background-color:#fff;
+  --secondary-background-color:#f7f7f7;
+  --tertiary-background-color:#7f7f7f;
+  --main-foreground-color:#000;
   --main-foreground-color_disabled:darkgrey;
-  --secondary-foreground-color: #555;
+  --secondary-foreground-color:#555;
   --icon-color:#111;
   --icon-color_disabled:darkgrey;
   --icon-hover-shadow-string:0 0 3px 2px #f0c37aaa;
@@ -150,7 +151,7 @@ body {
           cursor:pointer;
           margin-bottom:5px;
           &[aria-current=true] {
-            text-decoration: underline;
+            text-decoration:underline;
           }
         }
       }
@@ -318,7 +319,7 @@ body {
               overflow:hidden;
               cursor:pointer;
               &:focus + button > .material-icons {
-                will-change: transform;
+                will-change:transform;
               }
               &:hover .material-icons {
                 transform:scale(1.1);
@@ -360,7 +361,7 @@ body {
         &:last-of-type {
           display:grid;
           grid-template-columns:1fr;
-          grid-template-rows: auto auto auto auto;
+          grid-template-rows:auto auto auto auto;
           padding-top:13px;
           overflow-x:hidden;
           h3 {
@@ -399,7 +400,7 @@ body {
               &:hover {
                 animation:shake .7s ease both;
                 &:last-of-type > .material-icons {
-                  will-change: transform;
+                  will-change:transform;
                 }
               }
               &:focus {
@@ -413,7 +414,7 @@ body {
                 transition:color .3s ease;
               }
               &:last-of-type > .material-icons {
-                transition: transform .12s ease-in-out;
+                transition:transform .12s ease-in-out;
               }
 
               padding:1px 4px;
@@ -427,7 +428,7 @@ body {
                 overflow-y:hidden;
               }
               & > h3 > button:last-of-type > .material-icons {
-                transform: rotate(90deg);
+                transform:rotate(90deg);
               }
             }
           }
@@ -443,7 +444,7 @@ body {
             &:hover > button {
               will-change:transform;
               & > .material-icons {
-                will-change: color;
+                will-change:color;
               }
             }
             & > button {
@@ -453,9 +454,9 @@ body {
               transition:transform .3s ease;
               cursor:pointer;
               &:focus + button {
-                will-change: transform;
+                will-change:transform;
                 & > .material-icons {
-                  will-change: color;
+                  will-change:color;
                 }
               }
               &:hover {
@@ -601,22 +602,22 @@ body {
         display:block;
       }
       & > span {
-        position: absolute;
-        font-size: 1.4rem;
-        padding: 2px 3px;
-        line-height: 1.25;
+        position:absolute;
+        font-size:1.4rem;
+        padding:2px 3px;
+        line-height:1.25;
         & > span:first-of-type {
           visibility:hidden;
         }
         & > span:last-of-type {
           color:var(--secondary-foreground-color);
-          opacity:0.7;
+          opacity:.7;
         }
       }
       & > p {
-        color: var(--error-color);
+        color:var(--error-color);
         display:block;
-        font-size:0.8rem;
+        font-size:.8rem;
         margin-top:6px;
       }
     }
@@ -702,9 +703,11 @@ p {
 input, button {
   font-family:var(--root-font);
 }
+
 select, input {
-  background: var(--main-background-color);
-  border: 1px solid var(--tertiary-background-color);
+  background:var(--main-background-color);
+  border:1px solid var(--tertiary-background-color);
   border-radius:2px;
 }
-button, select, input { color: var(--main-foreground-color); }
+
+button, select, input { color:var(--main-foreground-color); }
