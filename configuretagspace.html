@@ -24,7 +24,7 @@
         <ul id="tag-list">
           <listed-tag v-for="([name,color],index) in tagList" :name="name" :color="color" :key="index" :ckey="index" v-on:update-name="updateTagName" v-on:update-color="updateTagColor" v-on:remove-tag="removeTag"></listed-tag>
         </ul>
-        <button style="padding-left:2px;margin-top:2px;" type="button" @click="addTag"><i class="material-icons" style="font-size:initial;vertical-align:sub;">add</i> Add Tag</button>
+        <button style="padding-left:2px; margin-top:2px;" type="button" @click="addTag"><i class="material-icons" style="font-size:initial; vertical-align:sub;">add</i> Add Tag</button>
       </fieldset>
       <fieldset id="add-props">
         <legend>Configure Properties</legend>
@@ -34,7 +34,7 @@
           <listed-prop name="Resolution (Required)" type="Resolution" :ckey="1002" disabled></listed-prop>
           <listed-prop v-for="([name,type],index) in propList" :name="name" :type="type" :key="index" :ckey="index" v-on:update-name="updatePropName" v-on:update-type="updatePropType" v-on:remove-prop="removeProp"></listed-prop>
         </ul>
-        <button style="padding-left:2px;margin-top:2px;" type="button" @click="addProp"><i class="material-icons" style="font-size:initial;vertical-align:sub;">add</i> Add Property</button>
+        <button style="padding-left:2px; margin-top:2px;" type="button" @click="addProp"><i class="material-icons" style="font-size:initial; vertical-align:sub;">add</i> Add Property</button>
       </fieldset>
       <button>Next</button>
     </form></div>
