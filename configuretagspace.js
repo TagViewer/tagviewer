@@ -27,7 +27,7 @@ new Vue({
         color: { validator: string => ((/^#([\dabcdef]{3}|[\dabcdef]{6})$/).test(string)) },
         ckey: Number
       },
-      template: '<li><label style="padding-left:0;" :for="nameInputId">Name:</label><input type="text" v-model.lazy="localName" :id="nameInputId" required><label :for="colorInputId">Color:</label><input required type="color" v-model.lazy="localColor" :id="colorInputId"><button type="button" @click="removeTag"><i class="material-icons">remove</i></button></li>',
+      template: '<li><label style="padding-left:0;" :for="nameInputId">Name:</label><input type="text" v-model.lazy="localName" :id="nameInputId" required class="name-input"><label :for="colorInputId">Color:</label><input required type="color" v-model.lazy="localColor" :id="colorInputId" class="color-input"><button type="button" @click="removeTag"><i class="material-icons">remove</i></button></li>',
       data: function () {
         return {
           localName: this.name,
@@ -73,7 +73,7 @@ new Vue({
         ckey: Number,
         disabled: Boolean
       },
-      template: '<li><label style="padding-left:0" v-bind:for="nameInputId">Name:</label><input type="text" v-model.lazy="localName" v-bind:disabled="disabled" v-bind:id="nameInputId" required><label v-bind:for="typeInputId">Type:</label><select required v-model.lazy="localType" v-bind:disabled="disabled" :id="typeInputId"><option value="String">String</option><option value="Number">Number</option><option value="Boolean">Boolean (yes or no)</option></select><button type="button" @click="removeProp" :style="{visibility:disabled?\'hidden\':\'visible\'}" :disabled="disabled"><i class="material-icons">remove</i></button></li>',
+      template: '<li><label style="padding-left:0" v-bind:for="nameInputId">Name:</label><input type="text" v-model.lazy="localName" v-bind:disabled="disabled" v-bind:id="nameInputId" required class="name-input"><label v-bind:for="typeInputId">Type:</label><select required v-model.lazy="localType" v-bind:disabled="disabled" :id="typeInputId" class="type-input"><option value="String">String</option><option value="Number">Number</option><option value="Boolean">Boolean (yes or no)</option></select><button type="button" @click="removeProp" :style="{visibility:disabled?\'hidden\':\'visible\'}" :disabled="disabled"><i class="material-icons">remove</i></button></li>',
       data: function () {
         return {
           localName: this.name,
@@ -113,11 +113,11 @@ new Vue({
     updateTagName: function (index, newValue) { this.tagList[index][0] = newValue; },
     updateTagColor: function (index, newValue) { this.tagList[index][1] = newValue; },
     removeTag: function (index) { this.$delete(this.tagList, index); },
-    addTag: function () { this.tagList.push(['', '#000000']); setTimeout(() => document.querySelector('#tag-list > li:last-of-type > input:first-of-type').focus(), 50); },
+    addTag: function () { this.tagList.push(['', '#000000']); setTimeout(() => document.querySelector('#tag-list > li:last-of-type > .name-input').focus(), 50); },
     updatePropName: function (index, newValue) { this.propList[index][0] = newValue; },
     updatePropType: function (index, newValue) { this.propList[index][1] = newValue; },
     removeProp: function (index) { this.$delete(this.propList, index); },
-    addProp: function () { this.propList.push(['', 'String']); setTimeout(() => document.querySelector('#prop-list > li:last-of-type > input:first-of-type').focus(), 50); },
+    addProp: function () { this.propList.push(['', 'String']); setTimeout(() => document.querySelector('#prop-list > li:last-of-type > .name-input').focus(), 50); },
     createTagspace: function () {
       this.tagviewerData = { title: this.tagspaceTitle, description: this.tagspaceDescription, tagList: this.tagList, deletedTags: [], propList: this.propList, files: [] };
       this.addImages();

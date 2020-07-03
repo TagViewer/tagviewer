@@ -28,15 +28,13 @@ form {
       flex-direction:row;
       justify-content:stretch;
       margin:3px 0;
-      input {
-        &:first-of-type {
-          padding-right:9px;
-          flex-grow:10;
-        }
-        &:nth-of-type(2) {
-          flex-grow:1;
-          max-width:90px;
-        }
+      .name-input {
+        padding-right:9px;
+        flex-grow:10;
+      }
+      .type-input {
+        flex-grow:1;
+        max-width:90px;
       }
       input, label {
         padding:0 6px;
@@ -92,15 +90,13 @@ form {
     li {
       display:contents;
       margin:3px 0;
-      input {
-        &:first-of-type {
-          padding-right:9px;
-          flex-grow:10;
-        }
-        &:nth-of-type(2) {
-          flex-grow:1;
-          max-width:90px;
-        }
+      .name-input {
+        padding-right:9px;
+        flex-grow:10;
+      }
+      .type-input {
+        flex-grow:1;
+        max-width:90px;
       }
       input, label {
         padding:0 6px;

@@ -26,7 +26,7 @@ const vm = new Vue({
   components: {
     'listed-tag': {
       props: ['tag', 'index'],
-      template: '<li><label style="padding-left:0;" :for="nameInputId">Name:</label><input type="text" v-model="name" :id="nameInputId" required><label :for="colorInputId">Color:</label><input required type="color" v-model.lazy="color" :id="colorInputId"><button type="button" @click="removeTag"><i class="material-icons">remove</i></button></li>',
+      template: '<li><label style="padding-left:0;" :for="nameInputId">Name:</label><input type="text" v-model="name" :id="nameInputId" required class="name-input"><label :for="colorInputId">Color:</label><input required type="color" v-model.lazy="color" :id="colorInputId" class="color-input"><button type="button" @click="removeTag"><i class="material-icons">remove</i></button></li>',
       computed: {
         nameInputId: function () {
           return `tagName${this.index}`;
@@ -49,7 +49,7 @@ const vm = new Vue({
     },
     'listed-prop': {
       props: ['prop', 'index'],
-      template: '<li><label style="padding-left:0" :for="nameInputId">Name:</label><input type="text" v-model="name" :id="nameInputId" required><label :for="typeInputId">Type:</label><select required v-model="type" :id="typeInputId"><option value="String">String</option><option value="Number">Number</option><option value="Boolean">Boolean (yes or no)</option></select><button type="button" @click="removeProp"><i class="material-icons">remove</i></button></li>',
+      template: '<li><label style="padding-left:0" :for="nameInputId">Name:</label><input type="text" v-model="name" :id="nameInputId" required class="name-input"><label :for="typeInputId">Type:</label><select required v-model="type" :id="typeInputId" class="type-input"><option value="String">String</option><option value="Number">Number</option><option value="Boolean">Boolean (yes or no)</option></select><button type="button" @click="removeProp"><i class="material-icons">remove</i></button></li>',
       computed: {
         nameInputId: function () {
           return `propName${this.index}`;
