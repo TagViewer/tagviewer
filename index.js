@@ -1159,6 +1159,8 @@ const store = new Vuex.Store({
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
         store.dispatch('changeMediaNumber', { newVal: 1, abs: true }); // always
       }
+      mediaNumberActuallyChanged = true;
+      vm.mediaNumber = 1;
     },
     addMedia: function (state, [object, index]) {
       console.assert(state.tagviewerMeta.currentIndex === index);
