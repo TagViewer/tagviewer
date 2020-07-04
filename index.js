@@ -4,8 +4,6 @@ const trash = require('trash');
 const path = require('path');
 const imageSize = require('image-size');
 
-if ((process.env.NODE_ENV ?? 'production') === 'development') app.globalShortcut.register('CmdOrCtrl+Shift+I', () => app.getCurrentWebContents().openDevTools());
-
 // #region Construct the application's menu
 /**
  * Process application menu clicks
@@ -216,6 +214,11 @@ appMenu.append(new app.MenuItem({
   role: 'close',
   accelerator: 'CmdOrCtrl+Q',
   label: 'Close'
+}));
+appMenu.append(new app.MenuItem({
+  role: 'toggleDevTools',
+  accelerator: 'CmdOrCtrl+Shift+I',
+  label: 'Toggle DevTools'
 }));
 appMenu.append(new app.MenuItem({
   type: 'separator'
