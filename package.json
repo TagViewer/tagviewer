@@ -35,7 +35,7 @@
   },
   "scripts": {
     "start": "electron-forge start",
-    "startdev": "NODE_ENV=development electron .",
+    "startdev": "NODE_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make-debug": "DEBUG=electron-forge:*,electron-installer-flatpak,flatpak-bundler electron-forge make"
