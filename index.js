@@ -1641,14 +1641,21 @@ const vm = new Vue({
             this.$el.children[5].focus();
           } else if (this.filter[1] === 'Size') {
             this.$emit('add-self', ['propSize', { condition: this.comparisonType, val: this.value * (10 ** parseInt(this.value2, 10)) }]);
+            this.clearInputs();
           } else if (this.filter[1] === 'Resolution') {
             this.$emit('add-self', ['propResolution', { condition: this.comparisonType, val: [this.value, this.value2], inclNoval: this.inclNoval }]);
+            this.clearInputs();
           } else {
             this.$emit('add-self', [`prop${this.filter[1]}`, this.filter[1] === 'Boolean' ? { positive: true, prop: this.filter[0], inclNoval: this.inclNoval } : { prop: this.filter[0], condition: this.comparisonType, val: this.value, inclNoval: this.inclNoval, caseSensitive: this.caseSensitive }]);
+            this.clearInputs();
           }
         },
         addSelfNegative: function () { // only for boolean
           this.$emit('add-self', ['propBoolean', { positive: false, prop: this.filter[0], inclNoval: this.inclNoval }]);
+        },
+        clearInputs: function () {
+          this.value = this.value2 = this.comparisonType = null;
+          this.inclNoval = this.caseSensitive = false;
         }
       }
     }
