@@ -1601,9 +1601,9 @@ const vm = new Vue({
   <select v-if="filter[1] !== 'Boolean'" v-model="comparisonType">
     <option v-for="option of comparisonContent" :value="option">{{option}}</option>
   </select>
-  <input v-if="filter[1] !== 'Boolean'" :type="inputType" v-model="value">
+  <input v-if="filter[1] !== 'Boolean'" :type="inputType" v-model="value" @keydown.enter="addSelf">
   <span v-if="filter[1] === 'Resolution'">&times;</span>
-  <input v-if="filter[1] === 'Resolution'" v-model="value2" type="number">
+  <input v-if="filter[1] === 'Resolution'" v-model="value2" type="number" @keydown.enter="addSelf">
   <select v-if="filter[1] === 'Size'" v-model="value2">
     <option value="0">B</option>
     <option value="3">kB</option>
