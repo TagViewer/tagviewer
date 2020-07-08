@@ -1637,6 +1637,8 @@ const vm = new Vue({
             this.$el.children[3].focus();
           } else if (this.filter[1] !== 'Boolean' && this.comparisonType === null) {
             this.$el.children[2].focus();
+          } else if (this.filter[1] === 'Resolution' && (this.value2 === '' || this.value2 === null)) {
+            this.$el.children[5].focus();
           } else if (this.filter[1] === 'Size') {
             this.$emit('add-self', ['propSize', { condition: this.comparisonType, val: this.value * (10 ** parseInt(this.value2, 10)) }]);
           } else if (this.filter[1] === 'Resolution') {
