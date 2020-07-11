@@ -125,7 +125,7 @@
     </footer>
     <div id="filter-quake" :aria-current="filterQuake">
       <span style="pointer-events:none;"><span id="autocomplete-spacer">{{tentativeFilterText}}</span><span id="autocomplete-offer">{{autocompleteFilterText}}</span></span>
-      <input aria-label="Compose the filter" type="text" v-model="tentativeFilterText">
+      <input aria-label="Compose the filter" type="text" v-model="tentativeFilterText" spellcheck="false">
       <p>&#x00a0;{{errorText}}</p>
     </div>
     </div>
