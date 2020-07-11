@@ -1504,6 +1504,9 @@ const vm = new Vue({
     }
   },
   computed: {
+    formattedTentativeFilterText: function () {
+      return this.tentativeFilterText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/#[0-9a-f]{6}/g, string => `<span style="text-decoration:underline; text-decoration-color:${string};">${string}</span>`);
+    },
     canGoToFirst: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber > 1; },
     canGoBack: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber > 1; },
     canGoForward: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber < this.$store.getters.numOfFiles; },

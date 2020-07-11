@@ -124,8 +124,13 @@
       <span v-if="tagspaceIsOpen">{{ showExitPrompt ? 'Saving changes to disk...' : 'All changes are saved to disk.' }}</span>
     </footer>
     <div id="filter-quake" :aria-current="filterQuake">
+<<<<<<< HEAD
       <span style="pointer-events:none;"><span id="autocomplete-spacer">{{tentativeFilterText}}</span><span id="autocomplete-offer">{{autocompleteFilterText}}</span></span>
       <input aria-label="Compose the filter" type="text" v-model="tentativeFilterText" spellcheck="false">
+=======
+      <span style="pointer-events:none;"><span id="autocomplete-spacer" v-html="formattedTentativeFilterText"></span><span id="autocomplete-offer">{{autocompleteFilterText}}</span></span>
+      <input aria-label="Compose the filter" type="text" v-model="tentativeFilterText">
+>>>>>>> 2e85018... Add color underlines to filter quake dialog
       <p>&#x00a0;{{errorText}}</p>
     </div>
     </div>
