@@ -25,7 +25,7 @@ const menuClick = item => {
     vm.newTagspaceDialog,
     vm.openTagspaceDialog,
     () => { if (store.getters.tagspaceIsOpen) vm.addMediaDialog(); },
-    () => { vm.configureTagSpaceDialog(); },
+    () => { if (store.getters.tagspaceIsOpen) vm.configureTagSpaceDialog(); },
     null,
     vm.replaceMedia,
     vm.deleteMedia,
