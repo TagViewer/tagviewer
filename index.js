@@ -526,7 +526,7 @@ const generateFilter = filter => {
         return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] >= parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10));
       }
       break;
-    case 'propNumber': // args: condition as String representing comparison, prop as String for the prop, val as Number for the value (includes Size) (and this is also for numericals like Size, Dimension, and Duration since they're stored in one unit—bytes, millimeters, and seconds respectively)
+    case 'propNumber': // args: condition as String representing comparison, prop as String for the prop, val as Number for the value (includes Size) (and this is also for numerics like Size, Dimension, and Duration since they're stored in one unit—bytes, millimeters, and seconds respectively)
       if (filter[1].condition === '=') {
         return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN)) === parseInt(filter[1].val, 10));
       }
@@ -1626,7 +1626,7 @@ const vm = new Vue({
           this.$store.state.currentFilters,
           el => el[0].startsWith('prop')
         ),
-        el => [el[1].prop, el[0].substring(4)] // accomodate properties with the same name but different types
+        el => [el[1].prop, el[0].substring(4)] // accommodate properties with the same name but different types
       );
       return Array.prototype.filter.call(
         Array.prototype.concat.call(this.$store.state.tagviewerMeta.propList, [['Title', 'String']]),
