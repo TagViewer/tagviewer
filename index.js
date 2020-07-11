@@ -1241,12 +1241,12 @@ const vm = new Vue({
         filterQuakeEl.children[1].select();
         document.body.children[0].addEventListener('click', filterQuakeContainerClickHandler());
         filterQuakeEl.children[1].addEventListener('input', filterQuakeAutocompleter());
-        filterQuakeEl.children[1].addEventListener('keydown', filterQuakeKeydownHandler(filterQuakeEl));
+        filterQuakeEl.children[1].addEventListener('keydown', filterQuakeKeydownHandler());
       } else {
         setTimeout(() => (vm.errorText = ''), 300);
         document.body.children[1].removeEventListener('click', filterQuakeContainerClickHandler());
         filterQuakeEl.children[1].removeEventListener('input', filterQuakeAutocompleter());
-        filterQuakeEl.children[1].removeEventListener('keydown', filterQuakeKeydownHandler(filterQuakeEl));
+        filterQuakeEl.children[1].removeEventListener('keydown', filterQuakeKeydownHandler());
       }
     },
     isFullscreen: function (isFS) {
@@ -1998,7 +1998,7 @@ function filterQuakeKeydownHandler () {
     if (e.key === 'Escape') vm.filterQuake = false;
     if (e.key === 'Enter') {
       const result = parseFilter(vm.tentativeFilterText);
-      if (result.err) { vm.errorText = result.value; }
+      if (result.err) vm.errorText = result.value;
       else {
         store.dispatch('replaceFilter', result.value);
         vm.filterQuake = false;
@@ -2031,12 +2031,10 @@ function filterQuakeAutocompleter () {
         options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
         if (options.length !== 0) { // if there are any
           vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
-        }
-        else {
+        } else {
           vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
         }
-      }
-      else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
+      } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
         if (processed.slice(0, 4) === 'prop') { // property filter
           processed = processed.slice(5); // remove 'prop:'
           if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
@@ -2078,8 +2076,9 @@ function filterQuakeAutocompleter () {
   };
 }
 
-function filterQuakeContainerClickHandler (filterQuakeEl) {
+function filterQuakeContainerClickHandler () {
   return function (e) {
+    const filterQuakeEl = document.getElementById('filter-quake');
     if (!e.path.includes(filterQuakeEl)) {
       e.preventDefault();
       vm.filterQuake = false;
