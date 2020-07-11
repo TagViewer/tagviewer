@@ -41,7 +41,7 @@ function handleSquirrelEvent() {
   const exeName = path.basename(process.execPath);
 
   const spawn = function(command, args) {
-    let spawnedProcess, error;
+    let spawnedProcess;
 
     try {
       spawnedProcess = ChildProcess.spawn(command, args, {detached: true});
@@ -141,7 +141,7 @@ electron.ipcMain.on('tagDeleted', (e, index) => {
   e.returnValue = true;
 });
 electron.ipcMain.on('getValues', (e, props) => { // take array, return array: ["a","b"] => [1,2]
-  let ret;
+  let ret = [];
   for (const propIdx in props) {
     ret[propIdx] = windowStorage[props[propIdx]];
   }

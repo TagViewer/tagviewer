@@ -4,6 +4,17 @@ const trash = require('trash');
 const path = require('path');
 const imageSize = require('image-size');
 
+const equals = function (a, other, callback = (x, y) => (x === y)) {
+  // Check the other object is of the same type
+  if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(other)) {
+    return false;
+  }
+  if (a.length === undefined || a.length !== other.length) {
+    return false;
+  }
+  return Array.prototype.every.call(a, (x, i) => callback(a, other[i]));
+};
+
 // #region Construct the application's menu
 /**
  * Process application menu clicks
@@ -682,17 +693,17 @@ const secondarySort = (a, b, by, method) => {
       break;
     case 'Resolution':
       if (method === '19') {
-        return !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+        return !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
           ? a.title.localeCompare(b.title) // compare their titles (tertiary sort)
-          : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1]) // if one has it but the other doesn't
-            ? b.resolution !== [-1, -1] - a.resolution !== [-1, -1] // put the one with it first.
+          : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1])) // if one has it but the other doesn't
+            ? !equals(b.resolution, [-1, -1]) - !equals(a.resolution, [-1, -1]) // put the one with it first.
             : a.resolution[0] * a.resolution[1] - b.resolution[0] * b.resolution[1]; // otherwise compare total pixels
       }
       if (method === '91') {
-        return !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+        return !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
           ? a.title.localeCompare(b.title) // compare their titles (tertiary sort)
-          : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1])
-            ? a.resolution !== [-1, -1] - b.resolution !== [-1, -1]
+          : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1]))
+            ? !equals(a.resolution, [-1, -1]) - !equals(b.resolution, [-1, -1])
             : b.resolution[0] * b.resolution[1] - a.resolution[0] * a.resolution[1];
       }
       break;
@@ -764,19 +775,19 @@ const sortUsing = (arr, by, method, by2, method2) => {
     case 'Resolution':
       if (method === '19') {
         return arr.concat().sort((a, b) =>
-          !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1]) // if no resolution info is present, the array will be [-1, -1]. Use that instead of hasOwnProperty to check for presence.
+          !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1]) // if no resolution info is present, the array will be [-1, -1]. Use that instead of hasOwnProperty to check for presence.
             ? secondarySort(a, b, by2, method2) // if they both don't have it or if they're the same, use secondarySort
-            : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1]) // if one has it but the other doesn't
-              ? b.resolution !== [-1, -1] - a.resolution !== [-1, -1] // put the one with it first.
+            : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1])) // if one has it but the other doesn't
+              ? !equals(b.resolution, [-1, -1]) - !equals(a.resolution, [-1, -1]) // put the one with it first.
               : a.resolution[0] * a.resolution[1] - b.resolution[0] * b.resolution[1] // otherwise compare total pixels
         );
       }
       if (method === '91') {
         return arr.concat().sort((a, b) => // same as above, but big goes before small
-          !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+          !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
             ? secondarySort(b, a, by2, method2)
-            : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1])
-              ? a.resolution !== [-1, -1] - b.resolution !== [-1, -1]
+            : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1]))
+              ? !equals(a.resolution, [-1, -1]) - !equals(b.resolution, [-1, -1])
               : b.resolution[0] * b.resolution[1] - a.resolution[0] * a.resolution[1]
         );
       }
@@ -955,7 +966,7 @@ const store = new Vuex.Store({
     currentFiles: (state, getters) => getters.currentFilesJSON.map(n => n._path), // the files that match the current filter ([] if no match or no filter or no open directory, [all files...] if no filter with open directory)
     currentFilesJSON: (state, getters) => {
       if (getters.tagspaceIsOpen) {
-        if (state.tagviewerMeta === {}) { // should never be the case.
+        if (Object.keys(state.tagviewerMeta).length === 0 && state.tagviewerMeta.constructor === Object) { // should never be the case.
           console.error('tagspaceIsOpen without tagviewerMeta.'); // store.commit('loadMetadata'); // needs to be a mutation since it's synchronous (the next instruction depends on its value.)
         }
         if (vm.sortBy !== 'Intrinsic' && vm.sortMethod !== '' && vm.sortMethodOptions.map(n => n.value).includes(vm.sortMethod)) {
@@ -1228,182 +1239,14 @@ const vm = new Vue({
       const filterQuakeEl = document.getElementById('filter-quake');
       if (active) {
         filterQuakeEl.children[1].select();
-        document.body.children[0].addEventListener('click', function (e) {
-          if (!e.path.includes(filterQuakeEl)) {
-            e.preventDefault();
-            vm.filterQuake = false;
-          }
-        });
-        filterQuakeEl.children[1].addEventListener('input', function () {
-          let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
-          let options = [];
-          if (processed.includes('+') || processed.includes('-')) {
-            processed = processed.slice(1);
-            if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
-              options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
-              if (options.length !== 0) { // if there are any
-                vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
-              } else {
-                vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
-              }
-            } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
-              if (processed.slice(0, 4) === 'prop') { // property filter
-                processed = processed.slice(5); // remove 'prop:'
-                if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
-                  options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) { // same as above
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // they're typing the value, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              } else { // tag/tagColor filter
-                if (processed.startsWith('tag:')) {
-                  processed = processed.slice(4); // remove 'tag:'
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else if (processed.startsWith('tagColor:')) {
-                  processed = processed.slice(9);
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][1].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // don't know what they're doing, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              }
-            }
-          } else { // they have nothing, do nothing.
-            vm.autocompleteFilterText = '';
-          }
-          if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
-        });
-        filterQuakeEl.children[1].addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') vm.filterQuake = false;
-          if (e.key === 'Enter') {
-            const result = parseFilter(vm.tentativeFilterText);
-            if (result.err) { vm.errorText = result.value; } else {
-              store.dispatch('replaceFilter', result.value);
-              vm.filterQuake = false;
-            }
-          }
-          if (e.key === 'ArrowRight') {
-            if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-          if (e.key === 'Tab') {
-            if (vm.autocompleteFilterText !== '') {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-        });
+        document.body.children[0].addEventListener('click', filterQuakeContainerClickHandler());
+        filterQuakeEl.children[1].addEventListener('input', filterQuakeAutocompleter());
+        filterQuakeEl.children[1].addEventListener('keydown', filterQuakeKeydownHandler(filterQuakeEl));
       } else {
         setTimeout(() => (vm.errorText = ''), 300);
-        document.body.children[1].removeEventListener('click', function (e) {
-          if (!e.path.includes(filterQuakeEl)) {
-            e.preventDefault();
-            vm.filterQuake = false;
-          }
-        });
-        filterQuakeEl.children[1].removeEventListener('input', function () {
-          let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
-          let options = [];
-          if (processed.includes('+') || processed.includes('-')) {
-            processed = processed.slice(1);
-            if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
-              options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
-              if (options.length !== 0) { // if there are any
-                vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
-              } else {
-                vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
-              }
-            } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
-              if (processed.slice(0, 4) === 'prop') { // property filter
-                processed = processed.slice(5); // remove 'prop:'
-                if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
-                  options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) { // same as above
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // they're typing the value, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              } else { // tag/tagColor filter
-                if (processed.startsWith('tag:')) {
-                  processed = processed.slice(4); // remove 'tag:'
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else if (processed.startsWith('tagColor:')) {
-                  processed = processed.slice(9);
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][1].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // don't know what they're doing, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              }
-            }
-          } else { // they have nothing, do nothing.
-            vm.autocompleteFilterText = '';
-          }
-          if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
-        });
-        filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
-          if (e.key === 'Escape') vm.filterQuake = false;
-          if (e.key === 'Enter') {
-            const result = parseFilter(vm.tentativeFilterText);
-            if (result.err) { vm.errorText = result.value; } else {
-              store.dispatch('replaceFilter', result.value);
-              vm.filterQuake = false;
-            }
-          }
-        });
-        filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
-          if (e.key === 'Escape') vm.filterQuake = false;
-          if (e.key === 'Enter') {
-            const result = parseFilter(vm.tentativeFilterText);
-            if (result.err) { vm.errorText = result.value; } else {
-              store.dispatch('replaceFilter', result.value);
-              vm.filterQuake = false;
-            }
-          }
-          if (e.key === 'ArrowRight') {
-            if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-          if (e.key === 'Tab') {
-            if (vm.autocompleteFilterText !== '') {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-        });
+        document.body.children[1].removeEventListener('click', filterQuakeContainerClickHandler());
+        filterQuakeEl.children[1].removeEventListener('input', filterQuakeAutocompleter());
+        filterQuakeEl.children[1].removeEventListener('keydown', filterQuakeKeydownHandler(filterQuakeEl));
       }
     },
     isFullscreen: function (isFS) {
@@ -2149,3 +1992,97 @@ window.onbeforeunload = function () {
 };
 
 document.body.classList.remove('before-content-load');
+
+function filterQuakeKeydownHandler () {
+  return function (e) {
+    if (e.key === 'Escape') vm.filterQuake = false;
+    if (e.key === 'Enter') {
+      const result = parseFilter(vm.tentativeFilterText);
+      if (result.err) { vm.errorText = result.value; }
+      else {
+        store.dispatch('replaceFilter', result.value);
+        vm.filterQuake = false;
+      }
+    }
+    if (e.key === 'ArrowRight') {
+      if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
+        e.preventDefault();
+        vm.tentativeFilterText += vm.autocompleteFilterText;
+        vm.autocompleteFilterText = '';
+      }
+    }
+    if (e.key === 'Tab') {
+      if (vm.autocompleteFilterText !== '') {
+        e.preventDefault();
+        vm.tentativeFilterText += vm.autocompleteFilterText;
+        vm.autocompleteFilterText = '';
+      }
+    }
+  };
+}
+
+function filterQuakeAutocompleter () {
+  return function () {
+    let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
+    let options = [];
+    if (processed.includes('+') || processed.includes('-')) {
+      processed = processed.slice(1);
+      if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
+        options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
+        if (options.length !== 0) { // if there are any
+          vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
+        }
+        else {
+          vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
+        }
+      }
+      else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
+        if (processed.slice(0, 4) === 'prop') { // property filter
+          processed = processed.slice(5); // remove 'prop:'
+          if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
+            options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
+            if (options.length !== 0) { // same as above
+              vm.autocompleteFilterText = options[0][0].slice(processed.length);
+            } else {
+              vm.autocompleteFilterText = '';
+            }
+          } else { // they're typing the value, leave them alone.
+            vm.autocompleteFilterText = '';
+          }
+        } else { // tag/tagColor filter
+          if (processed.startsWith('tag:')) {
+            processed = processed.slice(4); // remove 'tag:'
+            options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
+            if (options.length !== 0) {
+              vm.autocompleteFilterText = options[0][0].slice(processed.length);
+            } else {
+              vm.autocompleteFilterText = '';
+            }
+          } else if (processed.startsWith('tagColor:')) {
+            processed = processed.slice(9);
+            options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
+            if (options.length !== 0) {
+              vm.autocompleteFilterText = options[0][1].slice(processed.length);
+            } else {
+              vm.autocompleteFilterText = '';
+            }
+          } else { // don't know what they're doing, leave them alone.
+            vm.autocompleteFilterText = '';
+          }
+        }
+      }
+    } else { // they have nothing, do nothing.
+      vm.autocompleteFilterText = '';
+    }
+    if (vm.errorText) vm.errorText = '';
+  };
+}
+
+function filterQuakeContainerClickHandler (filterQuakeEl) {
+  return function (e) {
+    if (!e.path.includes(filterQuakeEl)) {
+      e.preventDefault();
+      vm.filterQuake = false;
+    }
+  };
+}
