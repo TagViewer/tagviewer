@@ -1414,7 +1414,7 @@ const vm = new Vue({
     },
     'filter-option': {
       props: ['filter', 'type'],
-      template: '<div :style="css"><button @click="addPositive"><i class="material-icons">add_circle</i></button><button @click="addNegative"><i class="material-icons">remove_circle</i></button><span>{{ content }}</span></div>',
+      template: '<div :style="css"><button @click="addPositive" :disabled="filter[2] ?? false"><i class="material-icons">add_circle</i></button><button @click="addNegative" :disabled="filter[3] ?? false"><i class="material-icons">remove_circle</i></button><span>{{ content }}</span></div>',
       computed: {
         content: function () {
           return this.filter[0];
@@ -1578,9 +1578,10 @@ const vm = new Vue({
           el => el[0] === 'tag'),
         el => el[1].tag
       );
+      const currentForbids = this.currentFilters.reduce((acc, el) => { if (el[0] === 'tagColor' && !el[1].positive) acc.push(el[1].color); return acc; }, []);
       return Array.prototype.filter.call( // only include the available tags (those that haven't yet been added)
         this.$store.state.tagviewerMeta.tagList,
-        (el, i) => !checkArray.includes(i)
+        (el, i) => !checkArray.includes(i) && !currentForbids.includes(el[1]) // prevents: negative color -> positive or negative tags with that color
       );
     },
     canSearchTags: function () {
@@ -1596,6 +1597,12 @@ const vm = new Vue({
           el => el[0] === 'tagColor'),
         el => el[1].color
       );
+      const currentForbids = [...this.currentFilters.reduce((acc, el) => { // prevents: positive tag -> positive color of that tag
+        if (el[0] === 'tag' && el[1].positive) {
+          acc.add(el[1].color);
+        }
+        return acc;
+      }, new Set())]; // spread'ing a set to ensure uniqueness
       return Array.prototype.map.call(
         Array.prototype.filter.call(
           [...new Set(Array.prototype.map.call(
@@ -1604,7 +1611,7 @@ const vm = new Vue({
           ))], // unique only (proven fastest in Node)
           el => !checkArray.includes(el)
         ),
-        el => [el, el] // to be compatible
+        el => [el, el, currentForbids.includes(el), false] // last two items are "forbidden as positive" and "...negative" respectively
       );
     },
     canSearchColors: function () {
