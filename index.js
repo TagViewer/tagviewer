@@ -398,7 +398,6 @@ if (Object.prototype.hasOwnProperty.call(config, 'theme') && config.theme !== 'd
  * @param {object[]} array - The array to apply the filters to
  * @param {filterArray[]} filters - The array of filters
  * @returns {object[]} - The filtered array
- * @function
  */
 const applyFilters = (array, filters) => {
   for (const filter of filters) {
@@ -411,7 +410,6 @@ const applyFilters = (array, filters) => {
  * Generate a function from a filter
  * @param {filterArray} filter - The filter, in the format specified
  * @returns {function(object): boolean} - A function to test whether an item matches the filter
- * @function
  */
 const generateFilter = filter => {
   switch (filter[0]) { // type
@@ -535,7 +533,6 @@ const generateFilter = filter => {
  * Convert an array of filterArrays to a string to be used in the filter quake dialog.
  * @param {filterArray[]} filters - the array of filters
  * @returns {string} - the filters, stringified
- * @function
  */
 const stringifyFilter = filters => {
   const ret = [];
@@ -548,7 +545,6 @@ const stringifyFilter = filters => {
  * Remove quotes if they are present and matching
  * @param {string} str - the string to check for quotes and remove if present and matching
  * @returns {string} - the string stripped of quotes
- * @function
  */
 const removeQuotes = str => (str[0] === "'" && str.slice(-1) === "'") || (str[0] === '"' && str.slice(-1) === '"') ? str.slice(1, -1) : str;
 /**
@@ -557,7 +553,6 @@ const removeQuotes = str => (str[0] === "'" && str.slice(-1) === "'") || (str[0]
  * @returns {filterArray} - the filter in filterArray format
  * @throws {SyntaxError} If the syntax of the string is not correct
  * @throws {ReferenceError} If a referenced  tag, color, or prop is referenced as the wrong type or is nonexistent
- * @function
  */
 const convertFilter = param => {
   if (!(['+', '-'].includes(param[0]))) throw new SyntaxError('A filter was specified without a sign (+ or -).');
@@ -607,7 +602,6 @@ const convertFilter = param => {
  * Split the full filter string into individual filter strings by spaces, respecting spaces in quotes.
  * @param {string} str - the full filter string
  * @returns {{err:boolean,value:string}} - the string split into individual filter strings
- * @function
  */
 const parseFilter = str => {
   const params = str.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/); // all this just to allow + and - within a quoted string...
@@ -626,7 +620,6 @@ const parseFilter = str => {
  * @param {string} by - the name of a property to compare with
  * @param {string} method - how to compare (A-Z or Z-A for string properties, for example)
  * @returns {number} - the number to sort the items with Array.prototype.sort.
- * @function
  */
 const secondarySort = (a, b, by, method) => {
   if (by === '' || method === '' || !vm.sortMethod2Options.includes(method)) { by = 'Title'; method = 'az'; }
@@ -708,7 +701,6 @@ const secondarySort = (a, b, by, method) => {
  * @param {string} by2 - the second property if the property matches between two items
  * @param {string} method2 - how to compare
  * @returns {object[]} - the sorted array
- * @function
  */
 const sortUsing = (arr, by, method, by2, method2) => {
   switch (by) {
@@ -802,23 +794,14 @@ fs.ensureDirSync(app.app.getPath('userData')); // is this necessary? I guess it'
 
 /**
  * Syncs the metadata for the TagSpace, waiting in the case of rapid requests.
- * @type {function}
- * @constant
- * @function
  */
 const debouncedSync = debounce(() => { store.dispatch('syncMetadata').then(() => { app.app.showExitPrompt = false; vm.showExitPrompt = false; }); }, 2000);
 /**
  * Syncs TagViewer's cache, waiting in the case of rapid requests.
- * @type {function}
- * @constant
- * @function
  */
 const debouncedCacheSync = debounce(() => { if (!safeMode[0]) fs.writeJSON(path.join(app.app.getPath('userData'), 'cache.json'), cache, { spaces: 2 }); }, 1400);
 /**
  * Syncs TagViewer's config, waiting in the case of rapid requests.
- * @type {function}
- * @constant
- * @function
  */
 const debouncedConfigSync = debounce(() => { if (!safeMode[1]) fs.writeJSON(path.join(app.app.getPath('userData'), 'config.json'), config, { spaces: 2 }); }, 1400);
 
