@@ -1105,6 +1105,7 @@ const store = new Vuex.Store({
           cache.openHistory.splice(cache.openHistory.indexOf(newDir), 1);
         }
         cache.openHistory.unshift(newDir);
+        cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
@@ -1116,6 +1117,7 @@ const store = new Vuex.Store({
           cache.openHistory.splice(cache.openHistory.indexOf(newDir), 1);
         }
         cache.openHistory.unshift(newDir);
+        cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
