@@ -15,7 +15,23 @@ const equals = function (a, other, callback = (x, y) => (x === y)) {
   return Array.prototype.every.call(a, (x, i) => callback(a, other[i]));
 };
 
-app.menu.setApplicationMenu(app.Menu.buildFromTemplate([
+const generateRecentlyOpened = function (tagspaceIsOpen) {
+  // if a tagspace is open, exclude the top-most entry since it's the one that's open
+  return (tagspaceIsOpen ? cache.openHistory.slice(1) : cache.openHistory).reduce((acc, el, i) => {
+    acc.push({
+      label: el,
+      accelerator: `CmdOrCtrl+Alt+${(i + 1) % 10}`,
+      click: ({ label }) => store.dispatch('changeWorkingDirectory', { newDir: label }) // use the label itself to give changeWorkingDirectory its directory.
+    });
+    return acc;
+  }, []);
+};
+const updateAppMenu = function (tagspaceIsOpen) {
+  menuTemplate[0].submenu[3].submenu = generateRecentlyOpened(tagspaceIsOpen);
+  app.Menu.setApplicationMenu(app.Menu.buildFromTemplate(menuTemplate));
+};
+
+const menuTemplate = [
   {
     label: '&TagSpace',
     submenu: [
@@ -33,6 +49,10 @@ app.menu.setApplicationMenu(app.Menu.buildFromTemplate([
         label: 'Open Previous TagSpace',
         accelerator: 'CmdOrCtrl+Shift+O',
         click: () => { if (!(vm.tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === '' || fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')))) vm.openPreviousTagspace(); }
+      },
+      {
+        label: 'Recently Opened',
+        submenu: []
       },
       {
         label: 'Add Media...',
@@ -210,7 +230,7 @@ app.menu.setApplicationMenu(app.Menu.buildFromTemplate([
       }
     ]
   }
-]));
+];
 
 ipcRenderer.on('syncMetadata', () => {
   store.dispatch('syncMetadata');
@@ -340,6 +360,7 @@ if (fs.existsSync(path.join(app.app.getPath('userData'), 'cache.json'))) {
   fs.writeJson(path.join(app.app.getPath('userData'), 'config.json'), {});
 }
 if (!Object.prototype.hasOwnProperty.call(cache, 'openHistory')) cache.openHistory = [];
+updateAppMenu(false); // must be called after cache is loaded.
 
 const setInterfaceTheme = theme => {
   new Map(Object.assign(Object.entries({
@@ -1090,6 +1111,7 @@ const store = new Vuex.Store({
         cache.openHistory.unshift(newDir);
         cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
+        updateAppMenu(true);
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
         store.dispatch('changeMediaNumber', { newVal: 1, abs: true }); // always
@@ -1102,6 +1124,7 @@ const store = new Vuex.Store({
         cache.openHistory.unshift(newDir);
         cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
+        updateAppMenu(true);
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
         store.dispatch('changeMediaNumber', { newVal: 1, abs: true }); // always
