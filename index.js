@@ -635,7 +635,7 @@ const parseFilter = str => {
   return { err: false, value: ret };
 };
 /**
- * Similar to {@link sortUsing}, but only returns a number that represents how to sort the two items, used by Array.prototype.sort.
+ * Similar to sortUsing, but only returns a number that represents how to sort the two items, used by Array.prototype.sort.
  * @param {object} a - the first item to compare
  * @param {object} b - the second item to compare
  * @param {string} by - the name of a property to compare with
