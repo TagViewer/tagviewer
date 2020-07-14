@@ -15,254 +15,202 @@ const equals = function (a, other, callback = (x, y) => (x === y)) {
   return Array.prototype.every.call(a, (x, i) => callback(a, other[i]));
 };
 
-// #region Construct the application's menu
-/**
- * Process application menu clicks
- * @param {object} item - passed by Electron when an item bound to this function is clicked.
-*/
-const menuClick = item => {
-  [
-    vm.newTagspaceDialog,
-    vm.openTagspaceDialog,
-    () => { if (store.getters.tagspaceIsOpen) vm.addMediaDialog(); },
-    () => { if (store.getters.tagspaceIsOpen) vm.configureTagSpaceDialog(); },
-    null,
-    vm.replaceMedia,
-    vm.deleteMedia,
-    vm.viewMediaExternal,
-    () => { if (vm.canGoToFirst) vm.goToFirstMedia(); },
-    () => { if (vm.canGoBack) vm.goToPreviousMedia(); },
-    () => { if (vm.haveMediaOptions) document.getElementById('media-number').select(); },
-    () => { if (vm.canGoForward) vm.goToNextMedia(); },
-    () => { if (vm.canGoToLast) vm.goToLastMedia(); },
-    () => { if (vm.tagspaceIsOpen) vm.newFilterTextQuake(); },
-    () => { if (vm.tagspaceIsOpen) vm.asideTab = 1; },
-    () => { if (vm.tagspaceIsOpen) vm.editFilterTextQuake(); },
-    () => { if (store.getters.filtersActive) store.dispatch('clearAllFilters'); },
-    () => vm.settingsDialog(),
-    () => app.shell.openShell(path.join(app.app.getPath('userData'), 'config.json')),
-    () => vm.aboutDialog(),
-    () => vm.helpDialog(),
-    () => { if (vm.haveMediaOptions) vm.startSlideshow(); },
-    () => { if (vm.haveMediaOptions) vm.startSlideshowFS(); },
-    () => { if (vm.haveMediaOptions) vm.endSlideshow(); },
-    () => { vm.isFullscreen = !vm.isFullscreen; },
-    () => { if (!(vm.tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === '' || fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')))) vm.openPreviousTagspace(); }
-  ][parseInt(item.id, 10)]();
-};
-const mainMenu = new app.Menu();
-const tagspaceMenu = new app.Menu();
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+N',
-  label: 'New TagSpace...',
-  id: '0'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+O',
-  label: 'Open TagSpace...',
-  id: '1'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+O',
-  label: 'Open Previous TagSpace...',
-  id: '25'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+I',
-  label: 'Add Media...',
-  id: '2'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  label: 'Configure TagSpace...',
-  id: '3'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&TagSpace',
-  submenu: tagspaceMenu
-}));
-const mediaMenu = new app.Menu();
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+H',
-  label: 'Replace Current Media...',
-  id: '5'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Backspace',
-  label: 'Delete Current Media',
-  id: '6'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+P',
-  label: 'Open Current Media Externally',
-  id: '7'
-}));
-mediaMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'Home',
-  label: 'Go to First Media',
-  id: '8'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'Left',
-  label: 'Go to Previous Media',
-  id: '9'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+G',
-  label: 'Go to...',
-  id: '10'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'Right',
-  label: 'Go to Next Media',
-  id: '11'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'End',
-  label: 'Go to Last Media',
-  id: '12'
-}));
-mediaMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+S',
-  label: 'Start Slideshow',
-  id: '21'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+S',
-  label: 'Start Slideshow (Fullscreen)',
-  id: '22'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+S',
-  label: 'End Slideshow',
-  id: '23'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&Media',
-  submenu: mediaMenu
-}));
-const filterMenu = new app.Menu();
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+F',
-  label: 'New Filter (Text)...',
-  id: '13'
-}));
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+F',
-  label: 'Edit Filter (UI)...',
-  id: '14'
-}));
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+Shift+F',
-  label: 'Edit Filter (Text)...',
-  id: '15'
-}));
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+C',
-  label: 'Clear all Filters',
-  id: '16'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&Filter',
-  submenu: filterMenu
-}));
-const appMenu = new app.Menu();
-appMenu.append(new app.MenuItem({
-  role: 'togglefullscreen',
-  accelerator: 'F11',
-  label: 'Fullscreen'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'zoomIn',
-  accelerator: 'CmdOrCtrl+Plus',
-  label: 'Zoom In'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'zoomOut',
-  accelerator: 'CmdOrCtrl+-',
-  label: 'Zoom Out'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'resetZoom',
-  accelerator: 'CmdOrCtrl+=',
-  label: 'Reset Zoom'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'F11',
-  label: 'Toggle Fullscreen',
-  id: '24'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'close',
-  accelerator: 'CmdOrCtrl+Q',
-  label: 'Close'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'toggleDevTools',
-  accelerator: 'CmdOrCtrl+Shift+I',
-  label: 'Toggle DevTools'
-}));
-appMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+,',
-  label: 'Settings (UI)',
-  id: '17'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+,',
-  label: 'Settings (JSON)',
-  id: '18'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  label: 'About TagViewer',
-  id: '19'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+/',
-  label: 'Help',
-  id: '20'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&App',
-  submenu: appMenu
-}));
-app.Menu.setApplicationMenu(mainMenu);
-// #endregion
+app.menu.setApplicationMenu(app.Menu.buildFromTemplate([
+  {
+    label: '&TagSpace',
+    submenu: [
+      {
+        label: 'New TagSpace...',
+        accelerator: 'CmdOrCtrl+N',
+        click: () => vm.newTagspaceDialog()
+      },
+      {
+        label: 'Open TagSpace...',
+        accelerator: 'CmdOrCtrl+O',
+        click: () => vm.openTagspaceDialog()
+      },
+      {
+        label: 'Open Previous TagSpace',
+        accelerator: 'CmdOrCtrl+Shift+O',
+        click: () => { if (!(vm.tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === '' || fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')))) vm.openPreviousTagspace(); }
+      },
+      {
+        label: 'Add Media...',
+        accelerator: 'CmdOrCtrl+I',
+        click: () => { if (store.getters.tagspaceIsOpen) vm.addMediaDialog(); }
+      },
+      {
+        type: 'separator'
+      },
+      {
+        label: 'Configure TagSpace...',
+        click: () => { if (store.getters.tagspaceIsOpen) vm.configureTagSpaceDialog(); }
+      }
+    ]
+  },
+  {
+    label: '&Media',
+    submenu: [
+      {
+        click: () => { if (vm.currentFiles.length > 0) vm.replaceMedia(); },
+        accelerator: 'CmdOrCtrl+H',
+        label: 'Replace Current Media...'
+      },
+      {
+        click: () => { if (vm.currentFiles.length > 0) vm.deleteMedia(); },
+        accelerator: 'CmdOrCtrl+Backspace',
+        label: 'Delete Current Media'
+      },
+      {
+        click: () => { if (vm.currentFiles.length > 0) vm.viewMediaExternal(); },
+        accelerator: 'CmdOrCtrl+P',
+        label: 'Open Current Media Externally'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        click: () => { if (vm.canGoToFirst) vm.goToFirstMedia(); },
+        accelerator: 'Home',
+        label: 'Go to First Media'
+      },
+      {
+        click: () => { if (vm.canGoBack) vm.goToPreviousMedia(); },
+        accelerator: 'Left',
+        label: 'Go to Previous Media'
+      },
+      {
+        click: () => { if (vm.haveMediaOptions) document.getElementById('media-number').select(); },
+        accelerator: 'CmdOrCtrl+G',
+        label: 'Go to...'
+      },
+      {
+        click: () => { if (vm.canGoForward) vm.goToNextMedia(); },
+        accelerator: 'Right',
+        label: 'Go to Next Media'
+      },
+      {
+        click: () => { if (vm.canGoToLast) vm.goToLastMedia(); },
+        accelerator: 'End',
+        label: 'Go to Last Media'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        click: () => { if (vm.haveMediaOptions) vm.startSlideshow(); },
+        accelerator: 'CmdOrCtrl+S',
+        label: 'Start Slideshow'
+      },
+      {
+        click: () => { if (vm.haveMediaOptions) vm.startSlideshowFS(); },
+        accelerator: 'CmdOrCtrl+Alt+S',
+        label: 'Start Slideshow (Fullscreen)'
+      },
+      {
+        click: () => { if (vm.haveMediaOptions) vm.endSlideshow(); },
+        accelerator: 'CmdOrCtrl+Shift+S',
+        label: 'End Slideshow'
+      }
+    ]
+  },
+  {
+    label: '&Filter',
+    submenu: [
+      {
+        click: () => { if (vm.tagspaceIsOpen) vm.newFilterTextQuake(); },
+        accelerator: 'CmdOrCtrl+Shift+F',
+        label: 'New Filter (Text)...',
+        id: '13'
+      },
+      {
+        click: () => { if (vm.tagspaceIsOpen) vm.asideTab = 1; },
+        accelerator: 'CmdOrCtrl+Alt+F',
+        label: 'Edit Filter (UI)...',
+        id: '14'
+      },
+      {
+        click: () => { if (vm.tagspaceIsOpen) vm.editFilterTextQuake(); },
+        accelerator: 'CmdOrCtrl+Alt+Shift+F',
+        label: 'Edit Filter (Text)...',
+        id: '15'
+      },
+      {
+        click: () => { if (store.getters.filtersActive) store.dispatch('clearAllFilters'); },
+        accelerator: 'CmdOrCtrl+Alt+C',
+        label: 'Clear all Filters',
+        id: '16'
+      }
+    ]
+  },
+  {
+    label: '&App',
+    submenu: [
+      {
+        role: 'togglefullscreen',
+        accelerator: 'F11',
+        label: 'Fullscreen'
+      },
+      {
+        role: 'zoomIn',
+        accelerator: 'CmdOrCtrl+Plus',
+        label: 'Zoom In'
+      },
+      {
+        role: 'zoomOut',
+        accelerator: 'CmdOrCtrl+-',
+        label: 'Zoom Out'
+      },
+      {
+        role: 'resetZoom',
+        accelerator: 'CmdOrCtrl+=',
+        label: 'Reset Zoom'
+      },
+      {
+        click: () => { vm.isFullscreen = !vm.isFullscreen; },
+        accelerator: 'F11',
+        label: 'Toggle Fullscreen',
+        id: '24'
+      },
+      {
+        role: 'close',
+        accelerator: 'CmdOrCtrl+Q',
+        label: 'Close'
+      },
+      {
+        role: 'toggleDevTools',
+        accelerator: 'CmdOrCtrl+Shift+I',
+        label: 'Toggle DevTools'
+      },
+      {
+        type: 'separator'
+      },
+      {
+        click: () => vm.settingsDialog(),
+        accelerator: 'CmdOrCtrl+,',
+        label: 'Settings (UI)',
+        id: '17'
+      },
+      {
+        click: () => app.shell.openShell(path.join(app.app.getPath('userData'), 'config.json')),
+        accelerator: 'CmdOrCtrl+Shift+,',
+        label: 'Settings (JSON)',
+        id: '18'
+      },
+      {
+        click: () => vm.aboutDialog(),
+        label: 'About TagViewer',
+        id: '19'
+      },
+      {
+        click: () => vm.helpDialog(),
+        accelerator: 'CmdOrCtrl+Shift+?',
+        label: 'Help',
+        id: '20'
+      }
+    ]
+  }
+]));
 
 ipcRenderer.on('syncMetadata', () => {
   store.dispatch('syncMetadata');
