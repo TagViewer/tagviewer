@@ -9,7 +9,7 @@ const equals = function (a, other, callback = (x, y) => (x === y)) {
   if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(other)) {
     return false;
   }
-  if (a.length === undefined || a.length !== other.length) {
+  if (a.length === (void 0) || a.length !== other.length) {
     return false;
   }
   return Array.prototype.every.call(a, (x, i) => callback(a, other[i]));
@@ -1723,7 +1723,7 @@ const vm = new Vue({
         properties: ['openFile', 'multiSelections'],
         message: "Select the media you'd like to add."
       });
-      if (fileList !== undefined) {
+      if (fileList !== (void 0)) {
         for (const i in fileList) {
           const file = fileList[i];
           fs.copyFileSync(file, path.join(this.$store.state.openDirectory, (parseInt(this.$store.state.tagviewerMeta.currentIndex, 10)) + path.extname(file))); // should this be synchronous?
