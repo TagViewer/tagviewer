@@ -15,223 +15,6 @@ const equals = function (a, other, callback = (x, y) => (x === y)) {
   return Array.prototype.every.call(a, (x, i) => callback(a, other[i]));
 };
 
-const generateRecentlyOpened = function (tagspaceIsOpen) {
-  // if a tagspace is open, exclude the top-most entry since it's the one that's open
-  return (tagspaceIsOpen ? cache.openHistory.slice(1) : cache.openHistory).reduce((acc, el, i) => {
-    acc.push({
-      label: el,
-      accelerator: `CmdOrCtrl+Alt+${(i + 1) % 10}`,
-      click: ({ label }) => store.dispatch('changeWorkingDirectory', { newDir: label }) // use the label itself to give changeWorkingDirectory its directory.
-    });
-    return acc;
-  }, []);
-};
-const updateAppMenu = function (tagspaceIsOpen) {
-  menuTemplate[0].submenu[3].submenu = generateRecentlyOpened(tagspaceIsOpen);
-  app.Menu.setApplicationMenu(app.Menu.buildFromTemplate(menuTemplate));
-};
-
-const menuTemplate = [
-  {
-    label: '&TagSpace',
-    submenu: [
-      {
-        label: 'New TagSpace...',
-        accelerator: 'CmdOrCtrl+N',
-        click: () => vm.newTagspaceDialog()
-      },
-      {
-        label: 'Open TagSpace...',
-        accelerator: 'CmdOrCtrl+O',
-        click: () => vm.openTagspaceDialog()
-      },
-      {
-        label: 'Open Previous TagSpace',
-        accelerator: 'CmdOrCtrl+Shift+O',
-        click: () => { if (!(vm.tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === '' || fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')))) vm.openPreviousTagspace(); }
-      },
-      {
-        label: 'Recently Opened',
-        submenu: []
-      },
-      {
-        label: 'Add Media...',
-        accelerator: 'CmdOrCtrl+I',
-        click: () => { if (store.getters.tagspaceIsOpen) vm.addMediaDialog(); }
-      },
-      {
-        type: 'separator'
-      },
-      {
-        label: 'Configure TagSpace...',
-        click: () => { if (store.getters.tagspaceIsOpen) vm.configureTagSpaceDialog(); }
-      }
-    ]
-  },
-  {
-    label: '&Media',
-    submenu: [
-      {
-        click: () => { if (vm.currentFiles.length > 0) vm.replaceMedia(); },
-        accelerator: 'CmdOrCtrl+H',
-        label: 'Replace Current Media...'
-      },
-      {
-        click: () => { if (vm.currentFiles.length > 0) vm.deleteMedia(); },
-        accelerator: 'CmdOrCtrl+Backspace',
-        label: 'Delete Current Media'
-      },
-      {
-        click: () => { if (vm.currentFiles.length > 0) vm.viewMediaExternal(); },
-        accelerator: 'CmdOrCtrl+P',
-        label: 'Open Current Media Externally'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        click: () => { if (vm.canGoToFirst) vm.goToFirstMedia(); },
-        accelerator: 'Home',
-        label: 'Go to First Media'
-      },
-      {
-        click: () => { if (vm.canGoBack) vm.goToPreviousMedia(); },
-        accelerator: 'Left',
-        label: 'Go to Previous Media'
-      },
-      {
-        click: () => { if (vm.haveMediaOptions) document.getElementById('media-number').select(); },
-        accelerator: 'CmdOrCtrl+G',
-        label: 'Go to...'
-      },
-      {
-        click: () => { if (vm.canGoForward) vm.goToNextMedia(); },
-        accelerator: 'Right',
-        label: 'Go to Next Media'
-      },
-      {
-        click: () => { if (vm.canGoToLast) vm.goToLastMedia(); },
-        accelerator: 'End',
-        label: 'Go to Last Media'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        click: () => { if (vm.haveMediaOptions) vm.startSlideshow(); },
-        accelerator: 'CmdOrCtrl+S',
-        label: 'Start Slideshow'
-      },
-      {
-        click: () => { if (vm.haveMediaOptions) vm.startSlideshowFS(); },
-        accelerator: 'CmdOrCtrl+Alt+S',
-        label: 'Start Slideshow (Fullscreen)'
-      },
-      {
-        click: () => { if (vm.haveMediaOptions) vm.endSlideshow(); },
-        accelerator: 'CmdOrCtrl+Shift+S',
-        label: 'End Slideshow'
-      }
-    ]
-  },
-  {
-    label: '&Filter',
-    submenu: [
-      {
-        click: () => { if (vm.tagspaceIsOpen) vm.newFilterTextQuake(); },
-        accelerator: 'CmdOrCtrl+Shift+F',
-        label: 'New Filter (Text)...',
-        id: '13'
-      },
-      {
-        click: () => { if (vm.tagspaceIsOpen) vm.asideTab = 1; },
-        accelerator: 'CmdOrCtrl+Alt+F',
-        label: 'Edit Filter (UI)...',
-        id: '14'
-      },
-      {
-        click: () => { if (vm.tagspaceIsOpen) vm.editFilterTextQuake(); },
-        accelerator: 'CmdOrCtrl+Alt+Shift+F',
-        label: 'Edit Filter (Text)...',
-        id: '15'
-      },
-      {
-        click: () => { if (store.getters.filtersActive) store.dispatch('clearAllFilters'); },
-        accelerator: 'CmdOrCtrl+Alt+C',
-        label: 'Clear all Filters',
-        id: '16'
-      }
-    ]
-  },
-  {
-    label: '&App',
-    submenu: [
-      {
-        role: 'togglefullscreen',
-        accelerator: 'F11',
-        label: 'Fullscreen'
-      },
-      {
-        role: 'zoomIn',
-        accelerator: 'CmdOrCtrl+Plus',
-        label: 'Zoom In'
-      },
-      {
-        role: 'zoomOut',
-        accelerator: 'CmdOrCtrl+-',
-        label: 'Zoom Out'
-      },
-      {
-        role: 'resetZoom',
-        accelerator: 'CmdOrCtrl+=',
-        label: 'Reset Zoom'
-      },
-      {
-        click: () => { vm.isFullscreen = !vm.isFullscreen; },
-        accelerator: 'F11',
-        label: 'Toggle Fullscreen',
-        id: '24'
-      },
-      {
-        role: 'close',
-        accelerator: 'CmdOrCtrl+Q',
-        label: 'Close'
-      },
-      {
-        role: 'toggleDevTools',
-        accelerator: 'CmdOrCtrl+Shift+I',
-        label: 'Toggle DevTools'
-      },
-      {
-        type: 'separator'
-      },
-      {
-        click: () => vm.settingsDialog(),
-        accelerator: 'CmdOrCtrl+,',
-        label: 'Settings (UI)',
-        id: '17'
-      },
-      {
-        click: () => app.shell.openShell(path.join(app.app.getPath('userData'), 'config.json')),
-        accelerator: 'CmdOrCtrl+Shift+,',
-        label: 'Settings (JSON)',
-        id: '18'
-      },
-      {
-        click: () => vm.aboutDialog(),
-        label: 'About TagViewer',
-        id: '19'
-      },
-      {
-        click: () => vm.helpDialog(),
-        accelerator: 'CmdOrCtrl+Shift+?',
-        label: 'Help',
-        id: '20'
-      }
-    ]
-  }
-];
-
 ipcRenderer.on('syncMetadata', () => {
   store.dispatch('syncMetadata');
   ipcRenderer.send('metadataSynced');
@@ -360,7 +143,6 @@ if (fs.existsSync(path.join(app.app.getPath('userData'), 'cache.json'))) {
   fs.writeJson(path.join(app.app.getPath('userData'), 'config.json'), {});
 }
 if (!Object.prototype.hasOwnProperty.call(cache, 'openHistory')) cache.openHistory = [];
-updateAppMenu(false); // must be called after cache is loaded.
 
 const setInterfaceTheme = theme => {
   new Map(Object.assign(Object.entries({
@@ -1111,7 +893,6 @@ const store = new Vuex.Store({
         cache.openHistory.unshift(newDir);
         cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
-        updateAppMenu(true);
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
         store.dispatch('changeMediaNumber', { newVal: 1, abs: true }); // always
@@ -1124,7 +905,6 @@ const store = new Vuex.Store({
         cache.openHistory.unshift(newDir);
         cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
-        updateAppMenu(true);
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
         store.dispatch('changeMediaNumber', { newVal: 1, abs: true }); // always
@@ -1211,6 +991,9 @@ const vm = new Vue({
       window.document.body.classList.toggle('fullscreen', isFS);
       app.getCurrentWindow().setFullScreen(isFS);
       app.getCurrentWindow().focus();
+    },
+    appMenu: function (newMenu) {
+      app.Menu.setApplicationMenu(app.Menu.buildFromTemplate(newMenu));
     }
   },
   components: {
@@ -1460,6 +1243,229 @@ const vm = new Vue({
     }
   },
   computed: {
+    appMenu: function () {
+      return [
+        {
+          label: '&TagSpace',
+          submenu: [
+            {
+              label: 'New TagSpace...',
+              accelerator: 'CmdOrCtrl+N',
+              click: () => vm.newTagspaceDialog()
+            },
+            {
+              label: 'Open TagSpace...',
+              accelerator: 'CmdOrCtrl+O',
+              click: () => vm.openTagspaceDialog()
+            },
+            {
+              label: 'Open Previous TagSpace',
+              accelerator: 'CmdOrCtrl+Shift+O',
+              click: () => vm.openPreviousTagspace(),
+              enabled: !this.tagspaceIsOpen && (config.offerPrevLocation ?? true) && cache.openDirectory !== '' && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json'))
+            },
+            {
+              label: 'Recently Opened',
+              submenu: (this.tagspaceIsOpen ? cache.openHistory.slice(1) : cache.openHistory).reduce((acc, el, i) => {
+                acc.push({
+                  label: el,
+                  accelerator: `CmdOrCtrl+Alt+${(i + 1) % 10}`,
+                  click: ({ label }) => store.dispatch('changeWorkingDirectory', { newDir: label }) // use the label itself to give changeWorkingDirectory its directory.
+                });
+                return acc;
+              }, [])
+            },
+            {
+              label: 'Add Media...',
+              accelerator: 'CmdOrCtrl+I',
+              click: () => vm.addMediaDialog(),
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              type: 'separator'
+            },
+            {
+              label: 'Configure TagSpace...',
+              click: () => vm.configureTagSpaceDialog(),
+              enabled: this.tagspaceIsOpen
+            }
+          ]
+        },
+        {
+          label: '&Media',
+          submenu: [
+            {
+              click: () => vm.replaceMedia(),
+              accelerator: 'CmdOrCtrl+H',
+              label: 'Replace Current Media...',
+              enabled: this.mediaIsOpen
+            },
+            {
+              click: () => vm.deleteMedia(),
+              accelerator: 'CmdOrCtrl+Backspace',
+              label: 'Delete Current Media',
+              enabled: this.mediaIsOpen
+            },
+            {
+              click: () => vm.viewMediaExternal(),
+              accelerator: 'CmdOrCtrl+P',
+              label: 'Open Current Media Externally',
+              enabled: this.mediaIsOpen
+            },
+            {
+              type: 'separator'
+            },
+            {
+              click: () => vm.goToFirstMedia(),
+              accelerator: 'Home',
+              label: 'Go to First Media',
+              enabled: this.canGoToFirst
+            },
+            {
+              click: () => vm.goToPreviousMedia(),
+              accelerator: 'Left',
+              label: 'Go to Previous Media',
+              enabled: this.canGoBack
+            },
+            {
+              click: () => document.getElementById('media-number').select(),
+              accelerator: 'CmdOrCtrl+G',
+              label: 'Go to...',
+              enabled: this.haveMediaOptions
+            },
+            {
+              click: () => vm.goToNextMedia(),
+              accelerator: 'Right',
+              label: 'Go to Next Media',
+              enabled: this.canGoForward
+            },
+            {
+              click: () => vm.goToLastMedia(),
+              accelerator: 'End',
+              label: 'Go to Last Media',
+              enabled: this.canGoToLast
+            },
+            {
+              type: 'separator'
+            },
+            {
+              click: () => vm.startSlideshow(),
+              accelerator: 'CmdOrCtrl+S',
+              label: 'Start Slideshow',
+              enabled: this.haveMediaOptions && this.slideshowInterval === null
+            },
+            {
+              click: () => vm.startSlideshowFS(),
+              accelerator: 'CmdOrCtrl+Alt+S',
+              label: 'Start Slideshow (Fullscreen)',
+              enabled: this.haveMediaOptions && this.slideshowInterval === null
+            },
+            {
+              click: () => vm.endSlideshow(),
+              accelerator: 'CmdOrCtrl+Shift+S',
+              label: 'End Slideshow',
+              enabled: this.slideshowInterval !== null
+            }
+          ]
+        },
+        {
+          label: '&Filter',
+          submenu: [
+            {
+              click: () => vm.newFilterTextQuake(),
+              accelerator: 'CmdOrCtrl+Shift+F',
+              label: 'New Filter (Text)...',
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              click: () => { vm.asideTab = 1; },
+              accelerator: 'CmdOrCtrl+Alt+F',
+              label: 'Edit Filter (UI)...',
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              click: () => vm.editFilterTextQuake(),
+              accelerator: 'CmdOrCtrl+Alt+Shift+F',
+              label: 'Edit Filter (Text)...',
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              click: () => store.dispatch('clearAllFilters'),
+              accelerator: 'CmdOrCtrl+Alt+C',
+              label: 'Clear all Filters',
+              enabled: this.filtersActive
+            }
+          ]
+        },
+        {
+          label: '&App',
+          submenu: [
+            {
+              role: 'togglefullscreen',
+              accelerator: 'F11',
+              label: 'Fullscreen'
+            },
+            {
+              role: 'zoomIn',
+              accelerator: 'CmdOrCtrl+Plus',
+              label: 'Zoom In'
+            },
+            {
+              role: 'zoomOut',
+              accelerator: 'CmdOrCtrl+-',
+              label: 'Zoom Out'
+            },
+            {
+              role: 'resetZoom',
+              accelerator: 'CmdOrCtrl+=',
+              label: 'Reset Zoom'
+            },
+            {
+              click: () => { vm.isFullscreen = !vm.isFullscreen; },
+              accelerator: 'F11',
+              label: 'Toggle Fullscreen',
+              id: '24'
+            },
+            {
+              role: 'close',
+              accelerator: 'CmdOrCtrl+Q',
+              label: 'Close'
+            },
+            {
+              role: 'toggleDevTools',
+              accelerator: 'CmdOrCtrl+Shift+I',
+              label: 'Toggle DevTools'
+            },
+            {
+              type: 'separator'
+            },
+            {
+              click: () => vm.settingsDialog(),
+              accelerator: 'CmdOrCtrl+,',
+              label: 'Settings (UI)',
+              id: '17'
+            },
+            {
+              click: () => app.shell.openShell(path.join(app.app.getPath('userData'), 'config.json')),
+              accelerator: 'CmdOrCtrl+Shift+,',
+              label: 'Settings (JSON)',
+              id: '18'
+            },
+            {
+              click: () => vm.aboutDialog(),
+              label: 'About TagViewer',
+              id: '19'
+            },
+            {
+              click: () => vm.helpDialog(),
+              accelerator: 'CmdOrCtrl+Shift+?',
+              label: 'Help',
+              id: '20'
+            }
+          ]
+        }
+      ];
+    },
     formattedTentativeFilterText: function () {
       return this.tentativeFilterText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/#[0-9a-f]{6}/g, string => `<span style="text-decoration:underline; text-decoration-color:${string};">${string}</span>`);
     },
@@ -1956,6 +1962,8 @@ window.onbeforeunload = function () {
   fs.writeJSON(path.join(app.app.getPath('userData'), 'cache.json'), cache);
   fs.writeJSON(path.join(app.app.getPath('userData'), 'config.json'), config);
 };
+
+app.Menu.setApplicationMenu(app.Menu.buildFromTemplate(vm.appMenu));
 
 document.body.classList.remove('before-content-load');
 
