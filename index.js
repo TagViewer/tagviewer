@@ -1585,18 +1585,7 @@ const vm = new Vue({
     shownColors: function () {
       return this.colorSearchString !== null ? this.allAvailColors.filter(el => el[0].includes(this.colorSearchString)) : this.allAvailColors;
     },
-    allAvailProps: function () { // does this need to be filtered? maybe the user wants to add two filters for the same property (eg, 3 < x < 5)
-      /* const checkArray = Array.prototype.map.call(
-        Array.prototype.filter.call(
-          this.$store.state.currentFilters,
-          el => el[0].startsWith('prop')
-        ),
-        el => [el[1].prop, el[0].substring(4)] // accommodate properties with the same name but different types
-      );
-      return Array.prototype.filter.call(
-        Array.prototype.concat.call(this.$store.state.tagviewerMeta.propList, [['Title', 'String']]),
-        el => !checkArray.includes(el[0])
-      ); */
+    allAvailProps: function () {
       return Array.prototype.concat.call([['Title', 'String'], ['Size', 'Size'], ['Resolution', 'Resolution']], this.$store.state.tagviewerMeta.propList);
     },
     canSearchProps: function () {
