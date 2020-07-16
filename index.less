@@ -248,9 +248,9 @@ body {
         text-align:start;
         margin:0;
         min-height:min-content;
-        max-height:100%;
-        padding:2px 12px; // adjust in JS as well
+        padding:2px 12px 5px 12px; // adjust in JS as well
         &#props {
+          max-height:~"calc(100% - 37px)";
           h3 {
             margin:.8rem 0 .6rem 0;
           }
@@ -366,6 +366,7 @@ body {
           grid-template-rows:auto auto auto auto;
           padding-top:13px;
           overflow-x:hidden;
+          max-height:~"calc(100% - 48px)";
           h3 {
             margin:1.1rem 0 .45rem 0;
             display:flex;
