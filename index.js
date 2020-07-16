@@ -365,7 +365,7 @@ const convertFilter = param => {
       if (Object.prototype.hasOwnProperty.call(store.getters.tagLookup, param.substring(param.indexOf(':') + 1))) throw new ReferenceError('The tag specified does not exist in this TagSpace. You may need to check your spelling.');
       return ['tag', { positive, tag: removeQuotes(param.substring(param.indexOf(':') + 1)), color: store.getters.tagLookup[param.substring(param.indexOf(':') + 1)] }];
     case 'color':
-      if (!Array.prototype.map.call(store.getters.tagviewerMeta.tagList, el => el[1]).includes(param.substring(param.indexOf(':') + 1))) throw new ReferenceError('The color specified does not belong to any tags in this TagSpace. Check that it matches exactly.');
+      if (Array.prototype.some.call(store.getters.tagviewerMeta.tagList, el => param.substring(param.indexOf(':') + 1) !== el[1])) throw new ReferenceError('The color specified does not belong to any tags in this TagSpace. Check that it matches exactly.');
       return ['tagColor', { positive, color: param.substring(param.indexOf(':') + 1) }];
     case 'prop':
     { let arglist = param.substring(param.indexOf(':') + 1).split(/<|>|=|<=|>=|!=|!{|{}/);
@@ -703,7 +703,7 @@ const store = new Vuex.Store({
         if (Object.keys(state.tagviewerMeta).length === 0 && state.tagviewerMeta.constructor === Object) { // should never be the case.
           console.error('tagspaceIsOpen without tagviewerMeta.'); // store.commit('loadMetadata'); // needs to be a mutation since it's synchronous (the next instruction depends on its value.)
         }
-        if (vm.sortBy !== 'Intrinsic' && vm.sortMethod !== '' && vm.sortMethodOptions.map(n => n.value).includes(vm.sortMethod)) {
+        if (vm.sortBy !== 'Intrinsic' && vm.sortMethod !== '' && Array.prototype.some.call(vm.sortMethodOptions, el => vm.sortMethod === el.value)) {
           const newValue = sortUsing(applyFilters(state.tagviewerMeta.files, state.currentFilters), vm.sortBy, vm.sortMethod, vm.sortBy2, vm.sortMethod2);
           if (currentIndex !== null && newValue.some(el => el._index === currentIndex) && !mediaNumberActuallyChanged) store.dispatch('changeMediaNumberNoDeps', { abs: true, newVal: newValue.findIndex(el => el._index === currentIndex) + 1, currentFileJSON: newValue.length === 0 ? null : newValue[clamp(1, mediaNumberCopy, newValue.length) - 1], numOfFiles: newValue.length });
           mediaNumberActuallyChanged = false;
@@ -1537,12 +1537,9 @@ const vm = new Vue({
       'currentFilters'
     ]),
     allAvailTags: function () { // TODO full compat filter with the colors (can't add include/exclude tag if its color is already included (redundant), and can't include/exclude tag if its color is already excluded (not possible). However you can exclude a tag when its color is included.) This will require a rewrite of how the available filters are represented (positive and negative would need to be separate.)
-      const checkArray = Array.prototype.map.call( // get the tag names
-        Array.prototype.filter.call( // only include filters that are for tags ^
-          this.$store.state.currentFilters,
-          el => el[0] === 'tag'),
-        el => el[1].tag
-      );
+      const checkArray = Array.prototype.reduce.call( // get the tag names
+        this.$store.state.currentFilters,
+        (acc, el) => el => { if (el[0] === 'tag') acc.push(el[1].tag); return acc; }, []);
       const currentForbids = this.currentFilters.reduce((acc, el) => { if (el[0] === 'tagColor' && !el[1].positive) acc.push(el[1].color); return acc; }, []);
       return Array.prototype.filter.call( // only include the available tags (those that haven't yet been added)
         this.$store.state.tagviewerMeta.tagList,
@@ -1556,28 +1553,23 @@ const vm = new Vue({
       return this.tagSearchString !== null ? this.allAvailTags.filter(el => el[0].toLowerCase().includes(this.tagSearchString.toLowerCase())) : this.allAvailTags;
     },
     allAvailColors: function () {
-      const checkArray = Array.prototype.map.call(
-        Array.prototype.filter.call(
-          this.$store.state.currentFilters,
-          el => el[0] === 'tagColor'),
-        el => el[1].color
-      );
+      const checkArray = Array.prototype.reduce.call(
+        this.$store.state.currentFilters,
+        (acc, el) => { if (el[0] === 'tagColor') acc.push(el[1].color); return acc; },[]);
       const currentForbids = [...this.currentFilters.reduce((acc, el) => { // prevents: positive tag -> positive color of that tag
         if (el[0] === 'tag' && el[1].positive) {
           acc.add(el[1].color);
         }
         return acc;
       }, new Set())]; // spread'ing a set to ensure uniqueness
-      return Array.prototype.map.call(
-        Array.prototype.filter.call(
-          [...new Set(Array.prototype.map.call(
-            this.$store.state.tagviewerMeta.tagList,
-            el => el[1]
-          ))], // unique only (proven fastest in Node)
-          el => !checkArray.includes(el)
-        ),
-        el => [el, el, currentForbids.includes(el), false] // last two items are "forbidden as positive" and "...negative" respectively
-      );
+      return Array.prototype.reduce.call(
+        this.$store.state.tagviewerMeta.tagList,
+        (acc, el) => {
+          if (!checkArray.includes(el[1]) && !acc.includes([el[1], el[1], currentForbids.includes(el), false])) {
+            acc.push([el[1], el[1], currentForbids.includes(el), false]);
+          }
+          return acc;
+        }, []);
     },
     canSearchColors: function () {
       return this.allAvailColors.length > 3;
