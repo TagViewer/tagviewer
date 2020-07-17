@@ -4,251 +4,16 @@ const trash = require('trash');
 const path = require('path');
 const imageSize = require('image-size');
 
-if ((process.env.NODE_ENV ?? 'production') === 'development') app.globalShortcut.register('CmdOrCtrl+Shift+I', () => app.getCurrentWebContents().openDevTools());
-
-// #region Construct the application's menu
-/**
- * Process application menu clicks
- * @param {object} item - passed by Electron when an item bound to this function is clicked.
-*/
-const menuClick = item => {
-  [
-    vm.newTagspaceDialog,
-    vm.openTagspaceDialog,
-    () => { if (store.getters.tagspaceIsOpen) vm.addMediaDialog(); },
-    () => { if (store.getters.tagspaceIsOpen) vm.configureTagSpaceDialog(); },
-    null,
-    () => { if (vm.currentFiles.length > 0) vm.replaceMedia(); },
-    () => { if (vm.currentFiles.length > 0) vm.deleteMedia(); },
-    () => { if (vm.currentFiles.length > 0) vm.viewMediaExternal(); },
-    () => { if (vm.canGoToFirst) vm.goToFirstMedia(); },
-    () => { if (vm.canGoBack) vm.goToPreviousMedia(); },
-    () => { if (vm.haveMediaOptions) document.getElementById('media-number').select(); },
-    () => { if (vm.canGoForward) vm.goToNextMedia(); },
-    () => { if (vm.canGoToLast) vm.goToLastMedia(); },
-    () => { if (vm.tagspaceIsOpen) vm.newFilterTextQuake(); },
-    () => { if (vm.tagspaceIsOpen) vm.asideTab = 1; },
-    () => { if (vm.tagspaceIsOpen) vm.editFilterTextQuake(); },
-    () => { if (store.getters.filtersActive) store.dispatch('clearAllFilters'); },
-    () => vm.settingsDialog(),
-    () => app.shell.openShell(path.join(app.app.getPath('userData'), 'config.json')),
-    () => vm.aboutDialog(),
-    () => vm.helpDialog(),
-    () => { if (vm.haveMediaOptions) vm.startSlideshow(); },
-    () => { if (vm.haveMediaOptions) vm.startSlideshowFS(); },
-    () => { if (vm.haveMediaOptions) vm.endSlideshow(); },
-    () => { vm.isFullscreen = !vm.isFullscreen; },
-    () => { if (!(vm.tagspaceIsOpen || !(config.offerPrevLocation ?? true) || cache.openDirectory === '' || fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json')))) vm.openPreviousTagspace(); }
-  ][parseInt(item.id, 10)]();
+const equals = function (a, other, callback = (x, y) => (x === y)) {
+  // Check the other object is of the same type
+  if (Object.getPrototypeOf(a) !== Object.getPrototypeOf(other)) {
+    return false;
+  }
+  if (a.length === (void 0) || a.length !== other.length) {
+    return false;
+  }
+  return Array.prototype.every.call(a, (x, i) => callback(a, other[i]));
 };
-const mainMenu = new app.Menu();
-const tagspaceMenu = new app.Menu();
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+N',
-  label: 'New TagSpace...',
-  id: '0'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+O',
-  label: 'Open TagSpace...',
-  id: '1'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+O',
-  label: 'Open Previous TagSpace...',
-  id: '25'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+I',
-  label: 'Add Media...',
-  id: '2'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-tagspaceMenu.append(new app.MenuItem({
-  click: menuClick,
-  label: 'Configure TagSpace...',
-  id: '3'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&TagSpace',
-  submenu: tagspaceMenu
-}));
-const mediaMenu = new app.Menu();
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+H',
-  label: 'Replace Current Media...',
-  id: '5'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Backspace',
-  label: 'Delete Current Media',
-  id: '6'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+P',
-  label: 'Open Current Media Externally',
-  id: '7'
-}));
-mediaMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'Home',
-  label: 'Go to First Media',
-  id: '8'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'Left',
-  label: 'Go to Previous Media',
-  id: '9'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+G',
-  label: 'Go to...',
-  id: '10'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'Right',
-  label: 'Go to Next Media',
-  id: '11'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'End',
-  label: 'Go to Last Media',
-  id: '12'
-}));
-mediaMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+S',
-  label: 'Start Slideshow',
-  id: '21'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+S',
-  label: 'Start Slideshow (Fullscreen)',
-  id: '22'
-}));
-mediaMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+S',
-  label: 'End Slideshow',
-  id: '23'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&Media',
-  submenu: mediaMenu
-}));
-const filterMenu = new app.Menu();
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+F',
-  label: 'New Filter (Text)...',
-  id: '13'
-}));
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+F',
-  label: 'Edit Filter (UI)...',
-  id: '14'
-}));
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+Shift+F',
-  label: 'Edit Filter (Text)...',
-  id: '15'
-}));
-filterMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Alt+C',
-  label: 'Clear all Filters',
-  id: '16'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&Filter',
-  submenu: filterMenu
-}));
-const appMenu = new app.Menu();
-appMenu.append(new app.MenuItem({
-  role: 'togglefullscreen',
-  accelerator: 'F11',
-  label: 'Fullscreen'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'zoomIn',
-  accelerator: 'CmdOrCtrl+Plus',
-  label: 'Zoom In'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'zoomOut',
-  accelerator: 'CmdOrCtrl+-',
-  label: 'Zoom Out'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'resetZoom',
-  accelerator: 'CmdOrCtrl+=',
-  label: 'Reset Zoom'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'F11',
-  label: 'Toggle Fullscreen',
-  id: '24'
-}));
-appMenu.append(new app.MenuItem({
-  role: 'close',
-  accelerator: 'CmdOrCtrl+Q',
-  label: 'Close'
-}));
-appMenu.append(new app.MenuItem({
-  type: 'separator'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+,',
-  label: 'Settings (UI)',
-  id: '17'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+,',
-  label: 'Settings (JSON)',
-  id: '18'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  label: 'About TagViewer',
-  id: '19'
-}));
-appMenu.append(new app.MenuItem({
-  click: menuClick,
-  accelerator: 'CmdOrCtrl+Shift+/',
-  label: 'Help',
-  id: '20'
-}));
-mainMenu.append(new app.MenuItem({
-  label: '&App',
-  submenu: appMenu
-}));
-app.Menu.setApplicationMenu(mainMenu);
-// #endregion
 
 ipcRenderer.on('syncMetadata', () => {
   store.dispatch('syncMetadata');
@@ -436,7 +201,6 @@ if (Object.prototype.hasOwnProperty.call(config, 'theme') && config.theme !== 'd
  * @param {object[]} array - The array to apply the filters to
  * @param {filterArray[]} filters - The array of filters
  * @returns {object[]} - The filtered array
- * @function
  */
 const applyFilters = (array, filters) => {
   for (const filter of filters) {
@@ -449,7 +213,6 @@ const applyFilters = (array, filters) => {
  * Generate a function from a filter
  * @param {filterArray} filter - The filter, in the format specified
  * @returns {function(object): boolean} - A function to test whether an item matches the filter
- * @function
  */
 const generateFilter = filter => {
   switch (filter[0]) { // type
@@ -512,7 +275,7 @@ const generateFilter = filter => {
         return n => ((n.resolution[0] !== -1 || filter[1].inclNoval) && n.resolution[0] * n.resolution[1] >= parseInt(filter[1].val[0], 10) * parseInt(filter[1].val[1], 10));
       }
       break;
-    case 'propNumber': // args: condition as String representing comparison, prop as String for the prop, val as Number for the value (includes Size) (and this is also for numericals like Size, Dimension, and Duration since they're stored in one unit—bytes, millimeters, and seconds respectively)
+    case 'propNumber': // args: condition as String representing comparison, prop as String for the prop, val as Number for the value (includes Size) (and this is also for numerics like Size, Dimension, and Duration since they're stored in one unit—bytes, millimeters, and seconds respectively)
       if (filter[1].condition === '=') {
         return n => ((n.props[filter[1].prop] ?? (filter[1].inclNoval ? filter[1].val : NaN)) === parseInt(filter[1].val, 10));
       }
@@ -573,7 +336,6 @@ const generateFilter = filter => {
  * Convert an array of filterArrays to a string to be used in the filter quake dialog.
  * @param {filterArray[]} filters - the array of filters
  * @returns {string} - the filters, stringified
- * @function
  */
 const stringifyFilter = filters => {
   const ret = [];
@@ -586,7 +348,6 @@ const stringifyFilter = filters => {
  * Remove quotes if they are present and matching
  * @param {string} str - the string to check for quotes and remove if present and matching
  * @returns {string} - the string stripped of quotes
- * @function
  */
 const removeQuotes = str => (str[0] === "'" && str.slice(-1) === "'") || (str[0] === '"' && str.slice(-1) === '"') ? str.slice(1, -1) : str;
 /**
@@ -595,7 +356,6 @@ const removeQuotes = str => (str[0] === "'" && str.slice(-1) === "'") || (str[0]
  * @returns {filterArray} - the filter in filterArray format
  * @throws {SyntaxError} If the syntax of the string is not correct
  * @throws {ReferenceError} If a referenced  tag, color, or prop is referenced as the wrong type or is nonexistent
- * @function
  */
 const convertFilter = param => {
   if (!(['+', '-'].includes(param[0]))) throw new SyntaxError('A filter was specified without a sign (+ or -).');
@@ -605,7 +365,7 @@ const convertFilter = param => {
       if (Object.prototype.hasOwnProperty.call(store.getters.tagLookup, param.substring(param.indexOf(':') + 1))) throw new ReferenceError('The tag specified does not exist in this TagSpace. You may need to check your spelling.');
       return ['tag', { positive, tag: removeQuotes(param.substring(param.indexOf(':') + 1)), color: store.getters.tagLookup[param.substring(param.indexOf(':') + 1)] }];
     case 'color':
-      if (!Array.prototype.map.call(store.getters.tagviewerMeta.tagList, el => el[1]).includes(param.substring(param.indexOf(':') + 1))) throw new ReferenceError('The color specified does not belong to any tags in this TagSpace. Check that it matches exactly.');
+      if (Array.prototype.some.call(store.getters.tagviewerMeta.tagList, el => param.substring(param.indexOf(':') + 1) !== el[1])) throw new ReferenceError('The color specified does not belong to any tags in this TagSpace. Check that it matches exactly.');
       return ['tagColor', { positive, color: param.substring(param.indexOf(':') + 1) }];
     case 'prop':
     { let arglist = param.substring(param.indexOf(':') + 1).split(/<|>|=|<=|>=|!=|!{|{}/);
@@ -645,7 +405,6 @@ const convertFilter = param => {
  * Split the full filter string into individual filter strings by spaces, respecting spaces in quotes.
  * @param {string} str - the full filter string
  * @returns {{err:boolean,value:string}} - the string split into individual filter strings
- * @function
  */
 const parseFilter = str => {
   const params = str.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/); // all this just to allow + and - within a quoted string...
@@ -658,13 +417,12 @@ const parseFilter = str => {
   return { err: false, value: ret };
 };
 /**
- * Similar to {@link sortUsing}, but only returns a number that represents how to sort the two items, used by Array.prototype.sort.
+ * Similar to sortUsing, but only returns a number that represents how to sort the two items, used by Array.prototype.sort.
  * @param {object} a - the first item to compare
  * @param {object} b - the second item to compare
  * @param {string} by - the name of a property to compare with
  * @param {string} method - how to compare (A-Z or Z-A for string properties, for example)
  * @returns {number} - the number to sort the items with Array.prototype.sort.
- * @function
  */
 const secondarySort = (a, b, by, method) => {
   if (by === '' || method === '' || !vm.sortMethod2Options.includes(method)) { by = 'Title'; method = 'az'; }
@@ -679,17 +437,17 @@ const secondarySort = (a, b, by, method) => {
       break;
     case 'Resolution':
       if (method === '19') {
-        return !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+        return !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
           ? a.title.localeCompare(b.title) // compare their titles (tertiary sort)
-          : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1]) // if one has it but the other doesn't
-            ? b.resolution !== [-1, -1] - a.resolution !== [-1, -1] // put the one with it first.
+          : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1])) // if one has it but the other doesn't
+            ? !equals(b.resolution, [-1, -1]) - !equals(a.resolution, [-1, -1]) // put the one with it first.
             : a.resolution[0] * a.resolution[1] - b.resolution[0] * b.resolution[1]; // otherwise compare total pixels
       }
       if (method === '91') {
-        return !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+        return !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
           ? a.title.localeCompare(b.title) // compare their titles (tertiary sort)
-          : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1])
-            ? a.resolution !== [-1, -1] - b.resolution !== [-1, -1]
+          : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1]))
+            ? !equals(a.resolution, [-1, -1]) - !equals(b.resolution, [-1, -1])
             : b.resolution[0] * b.resolution[1] - a.resolution[0] * a.resolution[1];
       }
       break;
@@ -746,7 +504,6 @@ const secondarySort = (a, b, by, method) => {
  * @param {string} by2 - the second property if the property matches between two items
  * @param {string} method2 - how to compare
  * @returns {object[]} - the sorted array
- * @function
  */
 const sortUsing = (arr, by, method, by2, method2) => {
   switch (by) {
@@ -761,19 +518,19 @@ const sortUsing = (arr, by, method, by2, method2) => {
     case 'Resolution':
       if (method === '19') {
         return arr.concat().sort((a, b) =>
-          !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1]) // if no resolution info is present, the array will be [-1, -1]. Use that instead of hasOwnProperty to check for presence.
+          !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1]) // if no resolution info is present, the array will be [-1, -1]. Use that instead of hasOwnProperty to check for presence.
             ? secondarySort(a, b, by2, method2) // if they both don't have it or if they're the same, use secondarySort
-            : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1]) // if one has it but the other doesn't
-              ? b.resolution !== [-1, -1] - a.resolution !== [-1, -1] // put the one with it first.
+            : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1])) // if one has it but the other doesn't
+              ? !equals(b.resolution, [-1, -1]) - !equals(a.resolution, [-1, -1]) // put the one with it first.
               : a.resolution[0] * a.resolution[1] - b.resolution[0] * b.resolution[1] // otherwise compare total pixels
         );
       }
       if (method === '91') {
         return arr.concat().sort((a, b) => // same as above, but big goes before small
-          !(a.resolution !== [-1, -1] || b.resolution !== [-1, -1]) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
+          !(!equals(a.resolution, [-1, -1]) || !equals(b.resolution, [-1, -1])) || (a.resolution[0] === b.resolution[0] && a.resolution[1] === b.resolution[1])
             ? secondarySort(b, a, by2, method2)
-            : !(a.resolution !== [-1, -1] && b.resolution !== [-1, -1])
-              ? a.resolution !== [-1, -1] - b.resolution !== [-1, -1]
+            : !(!equals(a.resolution, [-1, -1]) && !equals(b.resolution, [-1, -1]))
+              ? !equals(a.resolution, [-1, -1]) - !equals(b.resolution, [-1, -1])
               : b.resolution[0] * b.resolution[1] - a.resolution[0] * a.resolution[1]
         );
       }
@@ -840,23 +597,14 @@ fs.ensureDirSync(app.app.getPath('userData')); // is this necessary? I guess it'
 
 /**
  * Syncs the metadata for the TagSpace, waiting in the case of rapid requests.
- * @type {function}
- * @constant
- * @function
  */
 const debouncedSync = debounce(() => { store.dispatch('syncMetadata').then(() => { app.app.showExitPrompt = false; vm.showExitPrompt = false; }); }, 2000);
 /**
  * Syncs TagViewer's cache, waiting in the case of rapid requests.
- * @type {function}
- * @constant
- * @function
  */
 const debouncedCacheSync = debounce(() => { if (!safeMode[0]) fs.writeJSON(path.join(app.app.getPath('userData'), 'cache.json'), cache, { spaces: 2 }); }, 1400);
 /**
  * Syncs TagViewer's config, waiting in the case of rapid requests.
- * @type {function}
- * @constant
- * @function
  */
 const debouncedConfigSync = debounce(() => { if (!safeMode[1]) fs.writeJSON(path.join(app.app.getPath('userData'), 'config.json'), config, { spaces: 2 }); }, 1400);
 
@@ -952,10 +700,10 @@ const store = new Vuex.Store({
     currentFiles: (state, getters) => getters.currentFilesJSON.map(n => n._path), // the files that match the current filter ([] if no match or no filter or no open directory, [all files...] if no filter with open directory)
     currentFilesJSON: (state, getters) => {
       if (getters.tagspaceIsOpen) {
-        if (state.tagviewerMeta === {}) { // should never be the case.
+        if (Object.keys(state.tagviewerMeta).length === 0 && state.tagviewerMeta.constructor === Object) { // should never be the case.
           console.error('tagspaceIsOpen without tagviewerMeta.'); // store.commit('loadMetadata'); // needs to be a mutation since it's synchronous (the next instruction depends on its value.)
         }
-        if (vm.sortBy !== 'Intrinsic' && vm.sortMethod !== '' && vm.sortMethodOptions.map(n => n.value).includes(vm.sortMethod)) {
+        if (vm.sortBy !== 'Intrinsic' && vm.sortMethod !== '' && Array.prototype.some.call(vm.sortMethodOptions, el => vm.sortMethod === el.value)) {
           const newValue = sortUsing(applyFilters(state.tagviewerMeta.files, state.currentFilters), vm.sortBy, vm.sortMethod, vm.sortBy2, vm.sortMethod2);
           if (currentIndex !== null && newValue.some(el => el._index === currentIndex) && !mediaNumberActuallyChanged) store.dispatch('changeMediaNumberNoDeps', { abs: true, newVal: newValue.findIndex(el => el._index === currentIndex) + 1, currentFileJSON: newValue.length === 0 ? null : newValue[clamp(1, mediaNumberCopy, newValue.length) - 1], numOfFiles: newValue.length });
           mediaNumberActuallyChanged = false;
@@ -1143,6 +891,7 @@ const store = new Vuex.Store({
           cache.openHistory.splice(cache.openHistory.indexOf(newDir), 1);
         }
         cache.openHistory.unshift(newDir);
+        cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
@@ -1154,11 +903,14 @@ const store = new Vuex.Store({
           cache.openHistory.splice(cache.openHistory.indexOf(newDir), 1);
         }
         cache.openHistory.unshift(newDir);
+        cache.openHistory = cache.openHistory.slice(0, 10);
         cache.openDirectory = newDir;
         debouncedCacheSync();
         document.title = `TagViewer ${_version}\u2002\u2013\u2002${state.tagviewerMeta.title}`;
         store.dispatch('changeMediaNumber', { newVal: 1, abs: true }); // always
       }
+      mediaNumberActuallyChanged = true;
+      vm.mediaNumber = 1;
     },
     addMedia: function (state, [object, index]) {
       console.assert(state.tagviewerMeta.currentIndex === index);
@@ -1215,189 +967,22 @@ const vm = new Vue({
     isFullscreen: false,
     tagSearchString: null,
     colorSearchString: null,
-    propSearchString: null
+    propSearchString: null,
+    filterListCollapsed: [false, false, false]
   },
   watch: {
     filterQuake: function (active) {
       const filterQuakeEl = document.getElementById('filter-quake');
       if (active) {
         filterQuakeEl.children[1].select();
-        document.body.children[0].addEventListener('click', function (e) {
-          if (!e.path.includes(filterQuakeEl)) {
-            e.preventDefault();
-            vm.filterQuake = false;
-          }
-        });
-        filterQuakeEl.children[1].addEventListener('input', function () {
-          let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
-          let options = [];
-          if (processed.includes('+') || processed.includes('-')) {
-            processed = processed.slice(1);
-            if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
-              options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
-              if (options.length !== 0) { // if there are any
-                vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
-              } else {
-                vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
-              }
-            } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
-              if (processed.slice(0, 4) === 'prop') { // property filter
-                processed = processed.slice(5); // remove 'prop:'
-                if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
-                  options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) { // same as above
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // they're typing the value, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              } else { // tag/tagColor filter
-                if (processed.startsWith('tag:')) {
-                  processed = processed.slice(4); // remove 'tag:'
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else if (processed.startsWith('tagColor:')) {
-                  processed = processed.slice(9);
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][1].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // don't know what they're doing, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              }
-            }
-          } else { // they have nothing, do nothing.
-            vm.autocompleteFilterText = '';
-          }
-          if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
-        });
-        filterQuakeEl.children[1].addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') vm.filterQuake = false;
-          if (e.key === 'Enter') {
-            const result = parseFilter(vm.tentativeFilterText);
-            if (result.err) { vm.errorText = result.value; } else {
-              store.dispatch('replaceFilter', result.value);
-              vm.filterQuake = false;
-            }
-          }
-          if (e.key === 'ArrowRight') {
-            if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-          if (e.key === 'Tab') {
-            if (vm.autocompleteFilterText !== '') {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-        });
+        document.body.children[0].addEventListener('click', filterQuakeContainerClickHandler());
+        filterQuakeEl.children[1].addEventListener('input', filterQuakeAutocompleter());
+        filterQuakeEl.children[1].addEventListener('keydown', filterQuakeKeydownHandler());
       } else {
         setTimeout(() => (vm.errorText = ''), 300);
-        document.body.children[1].removeEventListener('click', function (e) {
-          if (!e.path.includes(filterQuakeEl)) {
-            e.preventDefault();
-            vm.filterQuake = false;
-          }
-        });
-        filterQuakeEl.children[1].removeEventListener('input', function () {
-          let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
-          let options = [];
-          if (processed.includes('+') || processed.includes('-')) {
-            processed = processed.slice(1);
-            if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
-              options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
-              if (options.length !== 0) { // if there are any
-                vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
-              } else {
-                vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
-              }
-            } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
-              if (processed.slice(0, 4) === 'prop') { // property filter
-                processed = processed.slice(5); // remove 'prop:'
-                if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
-                  options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) { // same as above
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // they're typing the value, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              } else { // tag/tagColor filter
-                if (processed.startsWith('tag:')) {
-                  processed = processed.slice(4); // remove 'tag:'
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][0].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else if (processed.startsWith('tagColor:')) {
-                  processed = processed.slice(9);
-                  options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
-                  if (options.length !== 0) {
-                    vm.autocompleteFilterText = options[0][1].slice(processed.length);
-                  } else {
-                    vm.autocompleteFilterText = '';
-                  }
-                } else { // don't know what they're doing, leave them alone.
-                  vm.autocompleteFilterText = '';
-                }
-              }
-            }
-          } else { // they have nothing, do nothing.
-            vm.autocompleteFilterText = '';
-          }
-          if (vm.errorText) vm.errorText = ''; // empty strings are falsy ;)
-        });
-        filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
-          if (e.key === 'Escape') vm.filterQuake = false;
-          if (e.key === 'Enter') {
-            const result = parseFilter(vm.tentativeFilterText);
-            if (result.err) { vm.errorText = result.value; } else {
-              store.dispatch('replaceFilter', result.value);
-              vm.filterQuake = false;
-            }
-          }
-        });
-        filterQuakeEl.children[1].removeEventListener('keydown', function (e) {
-          if (e.key === 'Escape') vm.filterQuake = false;
-          if (e.key === 'Enter') {
-            const result = parseFilter(vm.tentativeFilterText);
-            if (result.err) { vm.errorText = result.value; } else {
-              store.dispatch('replaceFilter', result.value);
-              vm.filterQuake = false;
-            }
-          }
-          if (e.key === 'ArrowRight') {
-            if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-          if (e.key === 'Tab') {
-            if (vm.autocompleteFilterText !== '') {
-              e.preventDefault();
-              vm.tentativeFilterText += vm.autocompleteFilterText;
-              vm.autocompleteFilterText = '';
-            }
-          }
-        });
+        document.body.children[1].removeEventListener('click', filterQuakeContainerClickHandler());
+        filterQuakeEl.children[1].removeEventListener('input', filterQuakeAutocompleter());
+        filterQuakeEl.children[1].removeEventListener('keydown', filterQuakeKeydownHandler());
       }
     },
     isFullscreen: function (isFS) {
@@ -1406,6 +991,9 @@ const vm = new Vue({
       window.document.body.classList.toggle('fullscreen', isFS);
       app.getCurrentWindow().setFullScreen(isFS);
       app.getCurrentWindow().focus();
+    },
+    appMenu: function (newMenu) {
+      app.Menu.setApplicationMenu(app.Menu.buildFromTemplate(newMenu));
     }
   },
   components: {
@@ -1565,7 +1153,7 @@ const vm = new Vue({
     },
     'filter-option': {
       props: ['filter', 'type'],
-      template: '<div :style="css"><button @click="addPositive"><i class="material-icons">add_circle</i></button><button @click="addNegative"><i class="material-icons">remove_circle</i></button><span>{{ content }}</span></div>',
+      template: '<div :style="css"><button @click="addPositive" :disabled="filter[2] ?? false"><i class="material-icons">add_circle</i></button><button @click="addNegative" :disabled="filter[3] ?? false"><i class="material-icons">remove_circle</i></button><span>{{ content }}</span></div>',
       computed: {
         content: function () {
           return this.filter[0];
@@ -1595,9 +1183,9 @@ const vm = new Vue({
   <select v-if="filter[1] !== 'Boolean'" v-model="comparisonType">
     <option v-for="option of comparisonContent" :value="option">{{option}}</option>
   </select>
-  <input v-if="filter[1] !== 'Boolean'" :type="inputType" v-model="value">
+  <input v-if="filter[1] !== 'Boolean'" :type="inputType" v-model="value" @keydown.enter="addSelf">
   <span v-if="filter[1] === 'Resolution'">&times;</span>
-  <input v-if="filter[1] === 'Resolution'" v-model="value2" type="number">
+  <input v-if="filter[1] === 'Resolution'" v-model="value2" type="number" @keydown.enter="addSelf">
   <select v-if="filter[1] === 'Size'" v-model="value2">
     <option value="0">B</option>
     <option value="3">kB</option>
@@ -1631,21 +1219,256 @@ const vm = new Vue({
             this.$el.children[3].focus();
           } else if (this.filter[1] !== 'Boolean' && this.comparisonType === null) {
             this.$el.children[2].focus();
+          } else if (this.filter[1] === 'Resolution' && (this.value2 === '' || this.value2 === null)) {
+            this.$el.children[5].focus();
           } else if (this.filter[1] === 'Size') {
             this.$emit('add-self', ['propSize', { condition: this.comparisonType, val: this.value * (10 ** parseInt(this.value2, 10)) }]);
+            this.clearInputs();
           } else if (this.filter[1] === 'Resolution') {
             this.$emit('add-self', ['propResolution', { condition: this.comparisonType, val: [this.value, this.value2], inclNoval: this.inclNoval }]);
+            this.clearInputs();
           } else {
             this.$emit('add-self', [`prop${this.filter[1]}`, this.filter[1] === 'Boolean' ? { positive: true, prop: this.filter[0], inclNoval: this.inclNoval } : { prop: this.filter[0], condition: this.comparisonType, val: this.value, inclNoval: this.inclNoval, caseSensitive: this.caseSensitive }]);
+            this.clearInputs();
           }
         },
         addSelfNegative: function () { // only for boolean
           this.$emit('add-self', ['propBoolean', { positive: false, prop: this.filter[0], inclNoval: this.inclNoval }]);
+        },
+        clearInputs: function () {
+          this.value = this.value2 = this.comparisonType = null;
+          this.inclNoval = this.caseSensitive = false;
         }
       }
     }
   },
   computed: {
+    appMenu: function () {
+      return [
+        {
+          label: '&TagSpace',
+          submenu: [
+            {
+              label: 'New TagSpace...',
+              accelerator: 'CmdOrCtrl+N',
+              click: () => vm.newTagspaceDialog()
+            },
+            {
+              label: 'Open TagSpace...',
+              accelerator: 'CmdOrCtrl+O',
+              click: () => vm.openTagspaceDialog()
+            },
+            {
+              label: 'Open Previous TagSpace',
+              accelerator: 'CmdOrCtrl+Shift+O',
+              click: () => vm.openPreviousTagspace(),
+              enabled: !this.tagspaceIsOpen && (config.offerPrevLocation ?? true) && cache.openDirectory !== '' && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json'))
+            },
+            {
+              label: 'Recently Opened',
+              submenu: (this.tagspaceIsOpen ? cache.openHistory.slice(1) : cache.openHistory).reduce((acc, el, i) => {
+                acc.push({
+                  label: el,
+                  accelerator: `CmdOrCtrl+Alt+${(i + 1) % 10}`,
+                  click: ({ label }) => store.dispatch('changeWorkingDirectory', { newDir: label }) // use the label itself to give changeWorkingDirectory its directory.
+                });
+                return acc;
+              }, [])
+            },
+            {
+              label: 'Add Media...',
+              accelerator: 'CmdOrCtrl+I',
+              click: () => vm.addMediaDialog(),
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              type: 'separator'
+            },
+            {
+              label: 'Configure TagSpace...',
+              click: () => vm.configureTagSpaceDialog(),
+              enabled: this.tagspaceIsOpen
+            }
+          ]
+        },
+        {
+          label: '&Media',
+          submenu: [
+            {
+              click: () => vm.replaceMedia(),
+              accelerator: 'CmdOrCtrl+H',
+              label: 'Replace Current Media...',
+              enabled: this.mediaIsOpen
+            },
+            {
+              click: () => vm.deleteMedia(),
+              accelerator: 'CmdOrCtrl+Backspace',
+              label: 'Delete Current Media',
+              enabled: this.mediaIsOpen
+            },
+            {
+              click: () => vm.viewMediaExternal(),
+              accelerator: 'CmdOrCtrl+P',
+              label: 'Open Current Media Externally',
+              enabled: this.mediaIsOpen
+            },
+            {
+              type: 'separator'
+            },
+            {
+              click: () => vm.goToFirstMedia(),
+              accelerator: 'Home',
+              label: 'Go to First Media',
+              enabled: this.canGoToFirst
+            },
+            {
+              click: () => vm.goToPreviousMedia(),
+              accelerator: 'Left',
+              label: 'Go to Previous Media',
+              enabled: this.canGoBack
+            },
+            {
+              click: () => document.getElementById('media-number').select(),
+              accelerator: 'CmdOrCtrl+G',
+              label: 'Go to...',
+              enabled: this.haveMediaOptions
+            },
+            {
+              click: () => vm.goToNextMedia(),
+              accelerator: 'Right',
+              label: 'Go to Next Media',
+              enabled: this.canGoForward
+            },
+            {
+              click: () => vm.goToLastMedia(),
+              accelerator: 'End',
+              label: 'Go to Last Media',
+              enabled: this.canGoToLast
+            },
+            {
+              type: 'separator'
+            },
+            {
+              click: () => vm.startSlideshow(),
+              accelerator: 'CmdOrCtrl+S',
+              label: 'Start Slideshow',
+              enabled: this.haveMediaOptions && this.slideshowInterval === null
+            },
+            {
+              click: () => vm.startSlideshowFS(),
+              accelerator: 'CmdOrCtrl+Alt+S',
+              label: 'Start Slideshow (Fullscreen)',
+              enabled: this.haveMediaOptions && this.slideshowInterval === null
+            },
+            {
+              click: () => vm.endSlideshow(),
+              accelerator: 'CmdOrCtrl+Shift+S',
+              label: 'End Slideshow',
+              enabled: this.slideshowInterval !== null
+            }
+          ]
+        },
+        {
+          label: '&Filter',
+          submenu: [
+            {
+              click: () => vm.newFilterTextQuake(),
+              accelerator: 'CmdOrCtrl+Shift+F',
+              label: 'New Filter (Text)...',
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              click: () => { vm.asideTab = 1; },
+              accelerator: 'CmdOrCtrl+Alt+F',
+              label: 'Edit Filter (UI)...',
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              click: () => vm.editFilterTextQuake(),
+              accelerator: 'CmdOrCtrl+Alt+Shift+F',
+              label: 'Edit Filter (Text)...',
+              enabled: this.tagspaceIsOpen
+            },
+            {
+              click: () => store.dispatch('clearAllFilters'),
+              accelerator: 'CmdOrCtrl+Alt+C',
+              label: 'Clear all Filters',
+              enabled: this.filtersActive
+            }
+          ]
+        },
+        {
+          label: '&App',
+          submenu: [
+            {
+              role: 'togglefullscreen',
+              accelerator: 'F11',
+              label: 'Fullscreen'
+            },
+            {
+              role: 'zoomIn',
+              accelerator: 'CmdOrCtrl+Plus',
+              label: 'Zoom In'
+            },
+            {
+              role: 'zoomOut',
+              accelerator: 'CmdOrCtrl+-',
+              label: 'Zoom Out'
+            },
+            {
+              role: 'resetZoom',
+              accelerator: 'CmdOrCtrl+=',
+              label: 'Reset Zoom'
+            },
+            {
+              click: () => { vm.isFullscreen = !vm.isFullscreen; },
+              accelerator: 'F11',
+              label: 'Toggle Fullscreen',
+              id: '24'
+            },
+            {
+              role: 'close',
+              accelerator: 'CmdOrCtrl+Q',
+              label: 'Close'
+            },
+            {
+              role: 'toggleDevTools',
+              accelerator: 'CmdOrCtrl+Shift+I',
+              label: 'Toggle DevTools'
+            },
+            {
+              type: 'separator'
+            },
+            {
+              click: () => vm.settingsDialog(),
+              accelerator: 'CmdOrCtrl+,',
+              label: 'Settings (UI)',
+              id: '17'
+            },
+            {
+              click: () => app.shell.openShell(path.join(app.app.getPath('userData'), 'config.json')),
+              accelerator: 'CmdOrCtrl+Shift+,',
+              label: 'Settings (JSON)',
+              id: '18'
+            },
+            {
+              click: () => vm.aboutDialog(),
+              label: 'About TagViewer',
+              id: '19'
+            },
+            {
+              click: () => vm.helpDialog(),
+              accelerator: 'CmdOrCtrl+Shift+?',
+              label: 'Help',
+              id: '20'
+            }
+          ]
+        }
+      ];
+    },
+    formattedTentativeFilterText: function () {
+      return this.tentativeFilterText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/#[0-9a-f]{6}/g, string => `<span style="text-decoration:underline; text-decoration-color:${string};">${string}</span>`);
+    },
     canGoToFirst: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber > 1; },
     canGoBack: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber > 1; },
     canGoForward: function () { return this.$store.getters.haveMediaOptions && this.$store.state.mediaNumber < this.$store.getters.numOfFiles; },
@@ -1714,15 +1537,13 @@ const vm = new Vue({
       'currentFilters'
     ]),
     allAvailTags: function () { // TODO full compat filter with the colors (can't add include/exclude tag if its color is already included (redundant), and can't include/exclude tag if its color is already excluded (not possible). However you can exclude a tag when its color is included.) This will require a rewrite of how the available filters are represented (positive and negative would need to be separate.)
-      const checkArray = Array.prototype.map.call( // get the tag names
-        Array.prototype.filter.call( // only include filters that are for tags ^
-          this.$store.state.currentFilters,
-          el => el[0] === 'tag'),
-        el => el[1].tag
-      );
+      const checkArray = Array.prototype.reduce.call( // get the tag names
+        this.$store.state.currentFilters,
+        (acc, el) => el => { if (el[0] === 'tag') acc.push(el[1].tag); return acc; }, []);
+      const currentForbids = this.currentFilters.reduce((acc, el) => { if (el[0] === 'tagColor' && !el[1].positive) acc.push(el[1].color); return acc; }, []);
       return Array.prototype.filter.call( // only include the available tags (those that haven't yet been added)
         this.$store.state.tagviewerMeta.tagList,
-        (el, i) => !checkArray.includes(i)
+        (el, i) => !checkArray.includes(i) && !currentForbids.includes(el[1]) // prevents: negative color -> positive or negative tags with that color
       );
     },
     canSearchTags: function () {
@@ -1732,22 +1553,23 @@ const vm = new Vue({
       return this.tagSearchString !== null ? this.allAvailTags.filter(el => el[0].toLowerCase().includes(this.tagSearchString.toLowerCase())) : this.allAvailTags;
     },
     allAvailColors: function () {
-      const checkArray = Array.prototype.map.call(
-        Array.prototype.filter.call(
-          this.$store.state.currentFilters,
-          el => el[0] === 'tagColor'),
-        el => el[1].color
-      );
-      return Array.prototype.map.call(
-        Array.prototype.filter.call(
-          [...new Set(Array.prototype.map.call(
-            this.$store.state.tagviewerMeta.tagList,
-            el => el[1]
-          ))], // unique only (proven fastest in Node)
-          el => !checkArray.includes(el)
-        ),
-        el => [el, el] // to be compatible
-      );
+      const checkArray = Array.prototype.reduce.call(
+        this.$store.state.currentFilters,
+        (acc, el) => { if (el[0] === 'tagColor') acc.push(el[1].color); return acc; },[]);
+      const currentForbids = [...this.currentFilters.reduce((acc, el) => { // prevents: positive tag -> positive color of that tag
+        if (el[0] === 'tag' && el[1].positive) {
+          acc.add(el[1].color);
+        }
+        return acc;
+      }, new Set())]; // spread'ing a set to ensure uniqueness
+      return Array.prototype.reduce.call(
+        this.$store.state.tagviewerMeta.tagList,
+        (acc, el) => {
+          if (!checkArray.includes(el[1]) && !acc.includes([el[1], el[1], currentForbids.includes(el), false])) {
+            acc.push([el[1], el[1], currentForbids.includes(el), false]);
+          }
+          return acc;
+        }, []);
     },
     canSearchColors: function () {
       return this.allAvailColors.length > 3;
@@ -1755,18 +1577,7 @@ const vm = new Vue({
     shownColors: function () {
       return this.colorSearchString !== null ? this.allAvailColors.filter(el => el[0].includes(this.colorSearchString)) : this.allAvailColors;
     },
-    allAvailProps: function () { // does this need to be filtered? maybe the user wants to add two filters for the same property (eg, 3 < x < 5)
-      /* const checkArray = Array.prototype.map.call(
-        Array.prototype.filter.call(
-          this.$store.state.currentFilters,
-          el => el[0].startsWith('prop')
-        ),
-        el => [el[1].prop, el[0].substring(4)] // accomodate properties with the same name but different types
-      );
-      return Array.prototype.filter.call(
-        Array.prototype.concat.call(this.$store.state.tagviewerMeta.propList, [['Title', 'String']]),
-        el => !checkArray.includes(el[0])
-      ); */
+    allAvailProps: function () {
       return Array.prototype.concat.call([['Title', 'String'], ['Size', 'Size'], ['Resolution', 'Resolution']], this.$store.state.tagviewerMeta.propList);
     },
     canSearchProps: function () {
@@ -1899,7 +1710,7 @@ const vm = new Vue({
         properties: ['openFile', 'multiSelections'],
         message: "Select the media you'd like to add."
       });
-      if (fileList !== undefined) {
+      if (fileList !== (void 0)) {
         for (const i in fileList) {
           const file = fileList[i];
           fs.copyFileSync(file, path.join(this.$store.state.openDirectory, (parseInt(this.$store.state.tagviewerMeta.currentIndex, 10)) + path.extname(file))); // should this be synchronous?
@@ -2133,4 +1944,99 @@ window.onbeforeunload = function () {
   fs.writeJSON(path.join(app.app.getPath('userData'), 'config.json'), config);
 };
 
+app.Menu.setApplicationMenu(app.Menu.buildFromTemplate(vm.appMenu));
+
 document.body.classList.remove('before-content-load');
+
+function filterQuakeKeydownHandler () {
+  return function (e) {
+    if (e.key === 'Escape') vm.filterQuake = false;
+    if (e.key === 'Enter') {
+      const result = parseFilter(vm.tentativeFilterText);
+      if (result.err) vm.errorText = result.value;
+      else {
+        store.dispatch('replaceFilter', result.value);
+        vm.filterQuake = false;
+      }
+    }
+    if (e.key === 'ArrowRight') {
+      if (vm.autocompleteFilterText !== '' && this.selectionEnd === this.value.length) {
+        e.preventDefault();
+        vm.tentativeFilterText += vm.autocompleteFilterText;
+        vm.autocompleteFilterText = '';
+      }
+    }
+    if (e.key === 'Tab') {
+      if (vm.autocompleteFilterText !== '') {
+        e.preventDefault();
+        vm.tentativeFilterText += vm.autocompleteFilterText;
+        vm.autocompleteFilterText = '';
+      }
+    }
+  };
+}
+
+function filterQuakeAutocompleter () {
+  return function () {
+    let processed = vm.tentativeFilterText.split(/\s(?=[+-])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?']+["])(?![+-][A-Za-z0-9~!@#$%^&*()_=`{}[\]\\|;,.<>/?"]+['])/).slice(-1)[0];
+    let options = [];
+    if (processed.includes('+') || processed.includes('-')) {
+      processed = processed.slice(1);
+      if (!processed.includes(':')) { // if so, we're autocompleting a filter type (tag, tagColor, prop)
+        options = ['tag:', 'tagColor:#', 'prop:'].filter(n => n.startsWith(processed)); // get the options that start with what's already written
+        if (options.length !== 0) { // if there are any
+          vm.autocompleteFilterText = options[0].slice(processed.length); // remove the part that is already written
+        } else {
+          vm.autocompleteFilterText = ''; // otherwise there's nothing to autocomplete
+        }
+      } else { // if not, we need to know if this is a property filter or a tag/tagColor filter.
+        if (processed.slice(0, 4) === 'prop') { // property filter
+          processed = processed.slice(5); // remove 'prop:'
+          if (!processed.match(/<|>|=|<=|>=|!=|!{|{}/)) { // suggest properties
+            options = [['Title'], ['Size'], ['Resolution'], ...store.state.tagviewerMeta.propList].filter(n => n[0].startsWith(processed));
+            if (options.length !== 0) { // same as above
+              vm.autocompleteFilterText = options[0][0].slice(processed.length);
+            } else {
+              vm.autocompleteFilterText = '';
+            }
+          } else { // they're typing the value, leave them alone.
+            vm.autocompleteFilterText = '';
+          }
+        } else { // tag/tagColor filter
+          if (processed.startsWith('tag:')) {
+            processed = processed.slice(4); // remove 'tag:'
+            options = store.state.tagviewerMeta.tagList.filter(n => n[0].startsWith(processed));
+            if (options.length !== 0) {
+              vm.autocompleteFilterText = options[0][0].slice(processed.length);
+            } else {
+              vm.autocompleteFilterText = '';
+            }
+          } else if (processed.startsWith('tagColor:')) {
+            processed = processed.slice(9);
+            options = store.state.tagviewerMeta.tagList.filter(n => n[1].startsWith(processed));
+            if (options.length !== 0) {
+              vm.autocompleteFilterText = options[0][1].slice(processed.length);
+            } else {
+              vm.autocompleteFilterText = '';
+            }
+          } else { // don't know what they're doing, leave them alone.
+            vm.autocompleteFilterText = '';
+          }
+        }
+      }
+    } else { // they have nothing, do nothing.
+      vm.autocompleteFilterText = '';
+    }
+    if (vm.errorText) vm.errorText = '';
+  };
+}
+
+function filterQuakeContainerClickHandler () {
+  return function (e) {
+    const filterQuakeEl = document.getElementById('filter-quake');
+    if (!e.path.includes(filterQuakeEl)) {
+      e.preventDefault();
+      vm.filterQuake = false;
+    }
+  };
+}

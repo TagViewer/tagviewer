@@ -35,7 +35,6 @@
   },
   "scripts": {
     "start": "electron-forge start",
-    "startdev": "NODE_ENV=development electron .",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "make-debug": "DEBUG=electron-forge:*,electron-installer-flatpak,flatpak-bundler electron-forge make"
@@ -60,7 +59,8 @@
           "^rawicons",
           "^translatorphrases.txt"
         ],
-        "executableName": "tagviewer"
+        "executableName": "tagviewer",
+        "icon": "icons/universal/icon"
       },
       "makers": [
         {
@@ -69,12 +69,11 @@
             "title": "TagViewer",
             "name": "tagviewer",
             "copyright": "TagViewer © 2020 Matt Fellenz",
-            "iconUrl": "file://icons/macwin/icon.ico",
-            "exe": "./tagviewer",
+            "iconUrl": "file://icons/universal/icon.ico",
             "noMsi": false,
             "setupExe": "tagviewerSetup.exe",
             "setupMsi": "tagviewerSetup.msi",
-            "setupIcon": "icons/macwin/icon.ico"
+            "setupIcon": "icons/universal/icon.ico"
           }
         },
         {
@@ -126,7 +125,7 @@
         {
           "name": "@electron-forge/maker-dmg",
           "config": {
-            "icon": "icons/macwin/icon.icns",
+            "icon": "icons/universal/icon.icns",
             "name": "TagViewer"
           }
         }

@@ -1,4 +1,8 @@
-html, body {height:calc(100% - 10px);font-family:sans-serif;}
+html, body {
+  height:calc(100% - 10px);
+  font-family:sans-serif;
+}
+
 form {
   fieldset {
     margin-bottom:6px;
@@ -9,7 +13,7 @@ form {
   }
   #basic-information .fields {
     display:grid;
-    grid-template-rows: auto auto;
+    grid-template-rows:auto auto;
     grid-template-columns:auto 1fr;
     row-gap:3px;
     label {
@@ -25,15 +29,13 @@ form {
       flex-direction:row;
       justify-content:stretch;
       margin:3px 0;
-      input {
-        &:first-of-type {
-          padding-right:9px;
-          flex-grow:10;
-        }
-        &:nth-of-type(2) {
-          flex-grow:1;
-          max-width:90px;
-        }
+      .name-input {
+        padding-right:9px;
+        flex-grow:10;
+      }
+      .color-input {
+        flex-grow:1;
+        max-width:90px;
       }
       input, label {
         padding:0 6px;
@@ -63,7 +65,7 @@ form {
           box-shadow:0 0 4px 1px #0002;
         }
         &:focus {
-          outline:1px auto rgba(240, 175, 47,1);
+          outline:1px auto rgba(240, 175, 47, 1);
           outline-offset:-1px;
         }
         &:disabled {
@@ -89,15 +91,13 @@ form {
       flex-direction:row;
       justify-content:stretch;
       margin:3px 0;
-      input {
-        &:first-of-type {
-          padding-right:9px;
-          flex-grow:10;
-        }
-        &:nth-of-type(2) {
-          flex-grow:1;
-          max-width:90px;
-        }
+      .name-input {
+        padding-right:9px;
+        flex-grow:10;
+      }
+      .type-input {
+        flex-grow:1;
+        max-width:90px;
       }
       input, label {
         padding:0 6px;

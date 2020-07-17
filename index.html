@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>TagViewer</title>
@@ -29,8 +29,8 @@
       <div class="divider"></div>
       <button type="button" :disabled="!filtersActive" id="remove-filter" title="Remove Filter" aria-label="Remove the Current Filter" v-on:click="removeAllFilters"><i class="material-icons">filter_none</i></button>
       <div class="divider"></div>
-      <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start" title="Slideshow" aria-label="Start a Slideshow" v-on:click="startSlideshow"><i class="material-icons" style="transform:scale(0.8)">slideshow</i></button>
-      <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start-fs" title="Slideshow (Fullscreen)" aria-label="Start a Slideshow in Fullscreen mode" v-on:click="startSlideshowFS"><i class="material-icons" style="transform:scale(1.05)">slideshow</i></button>
+      <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start" title="Slideshow" aria-label="Start a Slideshow" v-on:click="startSlideshow"><i class="material-icons" style="transform:scale(.8);">slideshow</i></button>
+      <button type="button" :disabled="!haveMediaOptions || slideshowInterval !== null" id="slideshow-start-fs" title="Slideshow (Fullscreen)" aria-label="Start a Slideshow in Fullscreen mode" v-on:click="startSlideshowFS"><i class="material-icons" style="transform:scale(1.05);">slideshow</i></button>
       <button type="button" :disabled="!haveMediaOptions || slideshowInterval === null" id="slideshow-end" title="End Slideshow" aria-label="End the Slideshow" v-on:click="endSlideshow"><i class="material-icons">stop</i></button>
       <div class="divider"></div>
       <button type="button" :disabled="!tagspaceIsOpen" id="edit-tagspace" title="Configure TagSpace" aria-label="Configure the current Tag Space." v-on:click="configureTagSpaceDialog"><i class="material-icons">edit</i></button>
@@ -42,11 +42,11 @@
       <button type="button" id="invert-colors" title="Invert Colors" aria-label="Invert the color scheme." v-on:click="invertColors"><i class="material-icons">invert_colors</i></button>
     </header>
     <nav id="nav">
-      <p style="margin-top:10px;text-align:center;width:100%;grid-area: napp;" v-show="!tagspaceIsOpen">No TagSpace Open.</p>
-      <ul style="grid-area: files;">
+      <p style="margin-top:10px; text-align:center; width:100%; grid-area:napp;" v-show="!tagspaceIsOpen">No TagSpace Open.</p>
+      <ul style="grid-area:files;">
         <media-entry v-for="(item,index) in currentFilesJSON" :name="item.title" :key="index" :ckey="index" @open-file="openSelf"></media-entry>
       </ul>
-      <div style="grid-area: sort;" v-if="mediaPath !== ''">
+      <div style="grid-area:sort;" v-if="mediaPath !== ''">
         <span>Sort by:&#x00a0;</span>
         <select v-model="sortBy">
           <option v-for="option in sortByOptions" :value="option">{{ option }}</option>
@@ -78,40 +78,40 @@
     </main>
     <aside id="filters-props">
       <nav id="aside-nav">
-        <button type="button" style="text-overflow:ellipsis;--underline-width:4.05rem;" @click="asideTab = 0;" :aria-current="asideTab === 0">Properties</button>
+        <button type="button" style="text-overflow:ellipsis; --underline-width:4.05rem;" @click="asideTab = 0;" :aria-current="asideTab === 0">Properties</button>
         <button type="button" style="--underline-width:2.47rem;" @click="asideTab = 1;" :aria-current="asideTab === 1">Filters</button>
       </nav>
-      <div v-show="!asideTab"> <!-- 0 is falsy --> <!-- Properties -->
+      <div v-show="!asideTab" id="props"> <!-- 0 is falsy --> <!-- Properties -->
         <h3 v-if="!mediaIsOpen" style="text-align:center;">No media open.</h3>
-        <ul v-if="mediaIsOpen">
+        <ul v-if="mediaIsOpen" id="prop-entries">
           <prop-entry v-for="(prop, index) in itemProperties" :prop="prop" :key="index" @change-self="changeProperty"></prop-entry>
         </ul>
         <h3 v-if="mediaIsOpen"><span>Tags</span></h3>
-        <div v-if="mediaIsOpen">
+        <div v-if="mediaIsOpen" id="applied-tags">
           <tag-entry v-for="(tag, index) in itemTags" :tag="tag" :key="index" :index="index" @remove-self="removeTag"></tag-entry>
         </div>
-        <div v-if="mediaIsOpen">
+        <div v-if="mediaIsOpen" id="offered-tags">
           <tag-option v-for="(tag, index) in offeredItemTags" :tag="tag" :key="index" @add-self="addTag"></tag-option>
         </div>
       </div>
-      <div v-show="asideTab"> <!-- 1 is truthy --> <!-- Filters -->
+      <div v-show="asideTab" id="filters"> <!-- 1 is truthy --> <!-- Filters -->
         <div id="current-filters" v-if="mediaIsOpen">
           <filter-chip v-for="(filter, index) of currentFilters" :filter="filter" :type="filter[0]" :key="index" :index="index" @remove-self="removeFilter"></filter-chip>
         </div>
-        <div v-if="mediaIsOpen">
-          <h3><i class="material-icons">local_offer</i> Tags <input type="text" v-if="tagSearchString !== null" v-model="tagSearchString" size="1" v-on:blur="function () { if (tagSearchString === '') tagSearchString = null; }"><button type="button" v-if="canSearchTags && tagSearchString === null" @click="tagSearchString = '';"><i class="material-icons">search</i></button></h3>
+        <div v-if="mediaIsOpen" :data-collapsed="filterListCollapsed[0]">
+          <h3><i class="material-icons">local_offer</i> Tags <input aria-label="Filter tags" type="text" v-if="tagSearchString !== null" v-model="tagSearchString" @keydown.escape="tagSearchString = null;" size="1" v-on:blur="function () { if (tagSearchString === '') tagSearchString = null; }"><button type="button" v-if="canSearchTags && tagSearchString === null" @click="tagSearchString = '';"><i class="material-icons">search</i></button><button class="collapser" type="button" @click="$set(filterListCollapsed, 0, !filterListCollapsed[0]);"><i class="material-icons">arrow_drop_down</i></button></h3>
           <div id="tag-offers">
             <filter-option v-for="(filter, index) of shownTags" :filter="filter" type="tag" :key="index" @add-self="addFilter"></filter-option>
           </div>
         </div>
-        <div v-if="mediaIsOpen">
-          <h3><i class="material-icons">invert_colors</i> Colors <input type="text" v-if="colorSearchString !== null" v-model="colorSearchString" size="1" v-on:blur="function () { if (colorSearchString === '') colorSearchString = null; }"><button type="button" v-if="canSearchColors && colorSearchString === null" @click="colorSearchString = '';"><i class="material-icons">search</i></button></h3>
+        <div v-if="mediaIsOpen" :data-collapsed="filterListCollapsed[1]">
+          <h3><i class="material-icons">invert_colors</i> Colors <input aria-label="Filter colors" type="text" v-if="colorSearchString !== null" v-model="colorSearchString" @keydown.escape="colorSearchString = null;" size="1" v-on:blur="function () { if (colorSearchString === '') colorSearchString = null; }"><button type="button" v-if="canSearchColors && colorSearchString === null" @click="colorSearchString = '';"><i class="material-icons">search</i></button><button class="collapser" type="button" @click="$set(filterListCollapsed, 1, !filterListCollapsed[1]);"><i class="material-icons">arrow_drop_down</i></button></h3>
           <div id="color-offers">
             <filter-option v-for="(filter, index) of shownColors" :filter="filter" type="color" :key="index" @add-self="addFilter"></filter-option>
           </div>
         </div>
-        <div v-if="mediaIsOpen">
-          <h3><i class="material-icons">article</i> Properties <input type="text" v-if="propSearchString !== null" v-model="propSearchString" size="1" v-on:blur="function () { if (propSearchString === '') propSearchString = null; }"><button type="button" v-if="canSearchProps && propSearchString === null" @click="propSearchString = '';"><i class="material-icons">search</i></button></h3>
+        <div v-if="mediaIsOpen" :data-collapsed="filterListCollapsed[2]">
+          <h3><i class="material-icons">article</i> Properties <input aria-label="Filter properties" type="text" v-if="propSearchString !== null" v-model="propSearchString" @keydown.escape="propSearchString = null;" size="1" v-on:blur="function () { if (propSearchString === '') propSearchString = null; }"><button type="button" v-if="canSearchProps && propSearchString === null" @click="propSearchString = '';"><i class="material-icons">search</i></button><button type="button" class="collapser" @click="$set(filterListCollapsed, 2, !filterListCollapsed[2]);"><i class="material-icons">arrow_drop_down</i></button></h3>
           <div id="prop-offers">
             <filter-option-prop v-for="(filter, index) of shownProps" :filter="filter" :key="index" @add-self="addPremadeFilter"></filter-option-prop>
           </div>
@@ -124,8 +124,8 @@
       <span v-if="tagspaceIsOpen">{{ showExitPrompt ? 'Saving changes to disk...' : 'All changes are saved to disk.' }}</span>
     </footer>
     <div id="filter-quake" :aria-current="filterQuake">
-      <span style="pointer-events:none;"><span>{{tentativeFilterText}}</span><span>{{autocompleteFilterText}}</span></span>
-      <input type="text" v-model="tentativeFilterText">
+      <span style="pointer-events:none;"><span id="autocomplete-spacer">{{tentativeFilterText}}</span><span id="autocomplete-offer">{{autocompleteFilterText}}</span></span>
+      <input aria-label="Compose the filter" type="text" v-model="tentativeFilterText" spellcheck="false">
       <p>&#x00a0;{{errorText}}</p>
     </div>
     </div>
