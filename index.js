@@ -815,8 +815,13 @@ const store = new Vuex.Store({
       }
       trash(path.join(state.openDirectory, state.tagviewerMeta.files[index]._path)).then(() => { // delete image non-permanently
         state.tagviewerMeta.files.splice(index, 1); // remove from files array.
+        state.tagviewerMeta.files = state.tagviewerMeta.files.map((el, i) => {
+          el._index = i;
+          return el;
+        });
+        state.tagviewerMeta.currentIndex -= 1;
+        debouncedSync();
       });
-      state.tagviewerMeta.currentIndex -= 1;
     },
     changeMediaNumber: function (state, { newVal, abs, numOfFiles }) { // if commit-ing directly, pass the number of files in the payload
       if (abs) {
