@@ -1,7 +1,7 @@
 {
   "name": "tagviewer",
   "productName": "TagViewer",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
   "repository": {
     "type": "git",
