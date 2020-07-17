@@ -786,7 +786,12 @@ const store = new Vuex.Store({
       store.dispatch('updatePropMenu');
     },
     loadMetadata: function (state) { // should be called as-is since it needs to be synchronous.
-      state.tagviewerMeta = fs.readJSONSync(path.join(state.openDirectory, 'tagviewer.json'));
+      try {
+        state.tagviewerMeta = fs.readJSONSync(path.join(state.openDirectory, 'tagviewer.json'));
+      } catch (err) {
+        dialog.showErrorBox('JSON was invalid.', `The JSON (at path: ${path.join(state.openDirectory, 'tagviewer.json')}) for this TagSpace is invalid. If you've edited the file, please fix any errors. If not, please report the issue on GitHub. TagViewer will now exit.\n\n(Specifically, the error that occured is as follows: ${err.toString()})`);
+        app.app.quit();
+      }
     },
     clampMediaNumber: function (state, payload) { // if commit-ing directly, pass the number of files through the payload
       if (state.mediaNumber < 1 || state.mediaNumber > payload) {
