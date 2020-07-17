@@ -118,7 +118,7 @@ function humanFileSize (bytes, si = false, dp = 1) {
  * @type {string}
  * @constant
  */
-const _version = '1.1.0';
+const _version = '1.1.1';
 document.title = `TagViewer ${_version}`;
 
 let config = {}; let cache = {}; const safeMode = [false, false];
@@ -786,7 +786,12 @@ const store = new Vuex.Store({
       store.dispatch('updatePropMenu');
     },
     loadMetadata: function (state) { // should be called as-is since it needs to be synchronous.
-      state.tagviewerMeta = fs.readJSONSync(path.join(state.openDirectory, 'tagviewer.json'));
+      try {
+        state.tagviewerMeta = fs.readJSONSync(path.join(state.openDirectory, 'tagviewer.json'));
+      } catch (err) {
+        dialog.showErrorBox('JSON was invalid.', `The JSON (at path: ${path.join(state.openDirectory, 'tagviewer.json')}) for this TagSpace is invalid. If you've edited the file, please fix any errors. If not, please report the issue on GitHub. TagViewer will now exit.\n\n(Specifically, the error that occured is as follows: ${err.toString()})`);
+        app.app.quit();
+      }
     },
     clampMediaNumber: function (state, payload) { // if commit-ing directly, pass the number of files through the payload
       if (state.mediaNumber < 1 || state.mediaNumber > payload) {
@@ -815,8 +820,13 @@ const store = new Vuex.Store({
       }
       trash(path.join(state.openDirectory, state.tagviewerMeta.files[index]._path)).then(() => { // delete image non-permanently
         state.tagviewerMeta.files.splice(index, 1); // remove from files array.
+        state.tagviewerMeta.files = state.tagviewerMeta.files.map((el, i) => {
+          el._index = i;
+          return el;
+        });
+        state.tagviewerMeta.currentIndex -= 1;
+        debouncedSync();
       });
-      state.tagviewerMeta.currentIndex -= 1;
     },
     changeMediaNumber: function (state, { newVal, abs, numOfFiles }) { // if commit-ing directly, pass the number of files in the payload
       if (abs) {
