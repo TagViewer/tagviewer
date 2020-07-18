@@ -55,9 +55,9 @@
     "forge": {
       "packagerConfig": {
         "ignore": [
-          "^lib/((?!min).)*$",
-          "^rawicons",
-          "^translatorphrases.txt"
+          "^\\/lib\\/((?!min).)*$",
+          "^\\/rawicons",
+          "^\\/translatorphrases\\.txt"
         ],
         "executableName": "tagviewer",
         "icon": "icons/universal/icon"
