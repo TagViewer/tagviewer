@@ -1565,7 +1565,7 @@ const vm = new Vue({
     allAvailColors: function () {
       const checkArray = Array.prototype.reduce.call(
         this.$store.state.currentFilters,
-        (acc, el) => { if (el[0] === 'tagColor') acc.push(el[1].color); return acc; },[]);
+        (acc, el) => { if (el[0] === 'tagColor') acc.push(el[1].color); return acc; }, []);
       const currentForbids = [...this.currentFilters.reduce((acc, el) => { // prevents: positive tag -> positive color of that tag
         if (el[0] === 'tag' && el[1].positive) {
           acc.add(el[1].color);

@@ -129,7 +129,7 @@ new Vue({
         properties: ['openFile', 'multiSelections'],
         message: "Cancel if you don't want to add media at this stage."
       });
-      if (fileList !== undefined) {
+      if (typeof fileList !== 'undefined') {
         for (const i in fileList) {
           const file = fileList[i];
           fs.copyFileSync(file, path.join(creationdir, i + path.extname(file))); // should this be synchronous?
@@ -145,7 +145,7 @@ new Vue({
           };
         }
       }
-      this.tagviewerData.currentIndex = fileList !== undefined ? fileList.length : 0;
+      this.tagviewerData.currentIndex = (typeof fileList !== 'undefined') ? fileList.length : 0;
       fs.writeFile(path.join(creationdir, 'tagviewer.json'), JSON.stringify(this.tagviewerData, null, 2), () => ipcRenderer.send('doneCreating'));
     }
   }
