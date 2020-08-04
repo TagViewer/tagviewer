@@ -1680,8 +1680,7 @@ const vm = new Vue({
                 modal: true,
                 webPreferences: {
                   enableRemoteModule: true,
-                  nodeIntegration: true,
-                  devTools: true
+                  nodeIntegration: true
                 },
                 backgroundColor: '#fff'
               });
@@ -1701,8 +1700,7 @@ const vm = new Vue({
             modal: true,
             webPreferences: {
               enableRemoteModule: true,
-              nodeIntegration: true,
-              devTools: true
+              nodeIntegration: true
             },
             backgroundColor: '#fff'
           });
@@ -1827,8 +1825,7 @@ const vm = new Vue({
         modal: true,
         webPreferences: {
           enableRemoteModule: true,
-          nodeIntegration: true,
-          devTools: true
+          nodeIntegration: true
         },
         backgroundColor: '#fff'
       });
