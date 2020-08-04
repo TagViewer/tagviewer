@@ -1849,8 +1849,7 @@ const vm = new Vue({
         icon: path.join(__dirname, 'icons', 'png', '64x64.png'),
         webPreferences: {
           enableRemoteModule: true,
-          nodeIntegration: true,
-          devTools: true
+          nodeIntegration: true
         }
       });
       ipcRenderer.sendSync('storeValue', ['configObject', config]);
