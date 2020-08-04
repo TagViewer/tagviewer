@@ -36,7 +36,7 @@
             <select disabled id="titleType">
               <option value="String">String</option>
             </select>
-            <button type="button" aria-hidden="true" hidden></button>
+            <button type="button" aria-hidden="true" style="visibility:hidden;"></button>
           </li>
           <li>
             <label style="padding-left:0;" for="sizeName">Name:</label>
@@ -45,7 +45,7 @@
             <select disabled id="sizeType">
               <option value="String">Size</option>
             </select>
-            <button type="button" aria-hidden="true" hidden></button>
+            <button type="button" aria-hidden="true" style="visibility:hidden;"></button>
           </li>
           <li>
             <label style="padding-left:0;" for="resolutionName">Name:</label>
@@ -54,7 +54,7 @@
             <select disabled id="resolutionType">
               <option value="String">Resolution</option>
             </select>
-            <button type="button" aria-hidden="true" hidden></button>
+            <button type="button" aria-hidden="true" style="visibility:hidden;"></button>
           </li>
           <listed-prop v-for="(prop, index) of metaObject.propList" :prop="prop" :key="index" :index="index" v-on:update-self="updateProp" v-on:remove-self="removeProp"></listed-prop>
         </ul>
