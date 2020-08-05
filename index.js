@@ -1272,18 +1272,19 @@ const vm = new Vue({
               label: 'Open Previous TagSpace',
               accelerator: 'CmdOrCtrl+Shift+O',
               click: () => vm.openPreviousTagspace(),
-              enabled: !this.tagspaceIsOpen && (config.offerPrevLocation ?? true) && cache.openDirectory !== '' && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json'))
+              enabled: !this.tagspaceIsOpen && (config.offerPrevLocation ?? true) && Object.prototype.hasOwnProperty.call(cache, 'openDirectory') && cache.openDirectory !== '' && fs.existsSync(path.join(cache.openDirectory, 'tagviewer.json'))
             },
             {
               label: 'Recently Opened',
-              submenu: (this.tagspaceIsOpen ? cache.openHistory.slice(1) : cache.openHistory).reduce((acc, el, i) => {
+              submenu: (this.tagspaceIsOpen ? (Object.prototype.hasOwnProperty.call(cache, 'openHistory') ? cache.openHistory.slice(1) : []) : (cache.openHistory ?? [])).reduce((acc, el, i) => {
                 acc.push({
                   label: el,
                   accelerator: `CmdOrCtrl+Alt+${(i + 1) % 10}`,
                   click: ({ label }) => store.dispatch('changeWorkingDirectory', { newDir: label }) // use the label itself to give changeWorkingDirectory its directory.
                 });
                 return acc;
-              }, [])
+              }, []),
+              enabled: Object.prototype.hasOwnProperty.call(cache, 'openHistory') && cache.openHistory.length > 0
             },
             {
               label: 'Add Media...',
