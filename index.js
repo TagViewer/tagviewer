@@ -118,7 +118,7 @@ function humanFileSize (bytes, si = false, dp = 1) {
  * @type {string}
  * @constant
  */
-const _version = '1.1.2';
+const _version = '1.1.3';
 document.title = `TagViewer ${_version}`;
 
 let config = {}; let cache = {}; const safeMode = [false, false];
@@ -1727,6 +1727,7 @@ const vm = new Vue({
             // the currentIndex is updated within the addMedia mutation called by the homonymous action.
             _path: (this.$store.state.tagviewerMeta.currentIndex) + path.extname(file),
             _origBasename: path.basename(file),
+            _index: this.$store.state.tagviewerMeta.currentIndex,
             tags: [],
             props: {},
             title: path.parse(file).name,
