@@ -1,7 +1,7 @@
 {
   "name": "tagviewer",
   "productName": "TagViewer",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
   "repository": {
     "type": "git",
@@ -83,7 +83,7 @@
           "name": "@electron-forge/maker-deb",
           "config": {
             "productDescription": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "section": [
               "utils",
               "graphics"
@@ -105,7 +105,7 @@
           "name": "@electron-forge/maker-rpm",
           "config": {
             "productDescription": "A simple program that allows viewing of images under any tag, as well as modifying those tags.",
-            "version": "1.1.2",
+            "version": "1.1.3",
             "section": [
               "utils",
               "graphics"

@@ -118,7 +118,7 @@ function humanFileSize (bytes, si = false, dp = 1) {
  * @type {string}
  * @constant
  */
-const _version = '1.1.2';
+const _version = '1.1.3';
 document.title = `TagViewer ${_version}`;
 
 let config = {}; let cache = {}; const safeMode = [false, false];
