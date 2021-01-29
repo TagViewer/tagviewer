@@ -1,3 +1,7 @@
+<h1 style="color:red">DEPRECATED AND UNMAINTAINED</h1>
+
+This project is going to be superceded by TagViewer 2. For that reason this project is unmaintained.
+
 # TagViewer
 [![DeepScan grade](https://deepscan.io/api/teams/10128/projects/12821/branches/205649/badge/grade.svg)](https://deepscan.io/dashboard#view=project&tid=10128&pid=12821&bid=205649) ![Latest release version](https://img.shields.io/github/v/release/tagviewer/tagviewer?sort=semver) ![Commits since latest release](https://img.shields.io/github/commits-since/tagviewer/tagviewer/latest/develop?sort=semver)     
 TagViewer is a simple program that allows viewing of media within a TagSpace, and rich filtering of that media with tags and properties that are stored by the program. You can also sort by values of properties or presence of tags, as well as show the media in a slideshow.
